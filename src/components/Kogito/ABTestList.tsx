@@ -245,7 +245,6 @@ export default function ABTestList() {
 
                   {/* Metrics Overview */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-bolt-bg-surface-alt p-3 rounded-lg border border-bolt-divider">
                     <div className="bg-bolt-surfaceAlt p-3 rounded-lg border border-bolt-divider">
                       <div className="text-xs text-bolt-text-secondary mb-1">Total Executions</div>
                       <div className="text-lg font-bold text-bolt-accent-gold">
