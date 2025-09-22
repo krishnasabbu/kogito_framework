@@ -157,14 +157,14 @@ export default function ABTestList() {
             placeholder="Search A/B tests..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-bolt-bg-surface-alt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-3 bg-bolt-surfaceAlt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
           />
         </div>
         
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-3 bg-bolt-bg-surface-alt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent"
+          className="px-4 py-3 bg-bolt-surfaceAlt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent"
         >
           <option value="all">All Status</option>
           <option value="draft">Draft</option>
@@ -246,13 +246,14 @@ export default function ABTestList() {
                   {/* Metrics Overview */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-bolt-bg-surface-alt p-3 rounded-lg border border-bolt-divider">
+                    <div className="bg-bolt-surfaceAlt p-3 rounded-lg border border-bolt-divider">
                       <div className="text-xs text-bolt-text-secondary mb-1">Total Executions</div>
                       <div className="text-lg font-bold text-bolt-accent-gold">
                         {test.metrics.totalExecutions.toLocaleString()}
                       </div>
                     </div>
                     
-                    <div className="bg-bolt-bg-surface-alt p-3 rounded-lg border border-bolt-divider">
+                    <div className="bg-bolt-surfaceAlt p-3 rounded-lg border border-bolt-divider">
                       <div className="text-xs text-bolt-text-secondary mb-1">Traffic Split</div>
                       <div className="text-lg font-bold text-bolt-text-primary">
                         {test.trafficSplit}% / {100 - test.trafficSplit}%

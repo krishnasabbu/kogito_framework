@@ -130,7 +130,7 @@ export default function ServicesDashboard() {
             placeholder="Search services..."
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-bolt-bg-surface-alt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-3 bg-bolt-surfaceAlt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
           />
         </div>
         
@@ -236,13 +236,13 @@ export default function ServicesDashboard() {
                       {service.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-1 text-xs bg-bolt-bg-surface-alt text-bolt-text-secondary rounded-full border border-bolt-divider"
+                          className="px-2 py-1 text-xs bg-bolt-surfaceAlt text-bolt-text-secondary rounded-full border border-bolt-divider"
                         >
                           {tag}
                         </span>
                       ))}
                       {service.tags.length > 3 && (
-                        <span className="px-2 py-1 text-xs bg-bolt-bg-surface-alt text-bolt-text-secondary rounded-full border border-bolt-divider">
+                        <span className="px-2 py-1 text-xs bg-bolt-surfaceAlt text-bolt-text-secondary rounded-full border border-bolt-divider">
                           +{service.tags.length - 3}
                         </span>
                       )}

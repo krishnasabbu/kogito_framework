@@ -45,7 +45,7 @@ body {
 }
 
 .btn-secondary {
-  @apply bg-bolt-bg-surface-alt hover:bg-bolt-hover text-bolt-text-default font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105;
+  @apply bg-bolt-surfaceAlt hover:bg-bolt-hover text-bolt-text-default font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105;
 }
 
 .btn-outline {
@@ -54,7 +54,7 @@ body {
 
 /* Professional card styles */
 .card {
-  @apply w-card bg-bolt-bg-surface text-bolt-text-default border border-bolt-divider rounded-card shadow-bolt backdrop-blur-sm;
+  @apply w-card bg-bolt-surface text-bolt-text-default border border-bolt-divider rounded-card shadow-bolt backdrop-blur-sm;
 }
 
 .card-hover {
@@ -99,7 +99,7 @@ body {
 
 /* Enhanced glassmorphism effects */
 .glass-card {
-  @apply backdrop-blur-lg bg-bolt-bg-surface/80 border border-bolt-divider/50 shadow-bolt-lg;
+  @apply backdrop-blur-lg bg-bolt-surface/80 border border-bolt-divider/50 shadow-bolt-lg;
 }
 
 .glass-button {

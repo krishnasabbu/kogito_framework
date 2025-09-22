@@ -98,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       {/* Footer */}
       {!isCollapsed && (
         <div className="p-4 border-t border-bolt-divider">
-          <div className="text-xs text-bolt-text-secondary text-center p-3 bg-bolt-bg-surface-alt rounded-xl font-medium border border-bolt-divider">
+          <div className="text-xs text-bolt-text-secondary text-center p-3 bg-bolt-surfaceAlt rounded-xl font-medium border border-bolt-divider">
             FlowForge Platform v1.0.0
           </div>
         </div>
