@@ -11,7 +11,7 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+        <div className="min-h-screen bg-bolt-bg-primary transition-colors">
           <Routes>
             {/* Main Layout with Sidebar - Always show Layout */}
             <Route path="/" element={<Layout />}>

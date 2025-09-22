@@ -104,12 +104,12 @@ export default function ServicesDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Services</h2>
-          <p className="text-gray-600 dark:text-gray-400">Manage and test your API services</p>
+          <h2 className="text-3xl font-bold text-bolt-text-primary">Services</h2>
+          <p className="text-bolt-text-secondary">Manage and test your API services</p>
         </div>
         
         <button
@@ -122,35 +122,35 @@ export default function ServicesDashboard() {
       </div>
 
       {/* Search and View Controls */}
-      <div className="card flex items-center gap-4 p-4">
+      <div className="card flex items-center gap-4 p-6">
         <div className="flex-1 relative">
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bolt-text-secondary" />
           <input
             type="text"
             placeholder="Search services..."
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            className="input pl-10"
+            className="w-full pl-10 pr-4 py-3 bg-bolt-bg-surface-alt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
           />
         </div>
         
         <div className="flex items-center gap-2">
           <button
             onClick={() => setViewMode('card')}
-            className={`p-2 rounded-lg transition-all duration-200 focus-wells ${
+            className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'card'
-                ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                ? 'bg-bolt-accent-red text-white shadow-bolt'
+                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
             }`}
           >
             <Grid size={20} />
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`p-2 rounded-lg transition-all duration-200 focus-wells ${
+            className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'table'
-                ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                ? 'bg-bolt-accent-red text-white shadow-bolt'
+                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
             }`}
           >
             <List size={20} />
@@ -161,17 +161,17 @@ export default function ServicesDashboard() {
       {/* Services Display */}
       {services.length === 0 ? (
         <div className="text-center py-16">
-          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Plus size={32} className="text-gray-400" />
+          <div className="w-16 h-16 bg-bolt-bg-surface-alt rounded-full flex items-center justify-center mx-auto mb-4">
+            <Plus size={32} className="text-bolt-text-disabled" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No services found</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <h3 className="text-xl font-medium text-bolt-text-primary mb-2">No services found</h3>
+          <p className="text-bolt-text-secondary mb-6">
             {searchTerm ? 'Try adjusting your search terms' : 'Create your first service to get started'}
           </p>
           {!searchTerm && (
             <button
               onClick={() => navigate('/services/new')}
-              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+              className="btn-primary"
             >
               Add Service
             </button>
@@ -180,19 +180,19 @@ export default function ServicesDashboard() {
       ) : (
         <>
           {viewMode === 'card' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {services.map((service) => (
                 <div
                   key={service.id}
-                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
+                  className="card-hover p-6 h-80 flex flex-col"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      <h3 className="text-lg font-semibold text-bolt-text-primary mb-2 truncate">
                         {service.name}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      <p className="text-sm text-bolt-text-secondary line-clamp-2">
                         {service.description}
                       </p>
                     </div>
@@ -204,7 +204,7 @@ export default function ServicesDashboard() {
 
                   {/* URL */}
                   <div className="mb-4">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate font-mono">
+                    <p className="text-sm text-bolt-text-secondary truncate font-mono">
                       {service.url}
                     </p>
                   </div>
@@ -214,16 +214,16 @@ export default function ServicesDashboard() {
                     <div className="flex items-center gap-4 mb-4 text-sm">
                       <div className="flex items-center gap-1">
                         {service.response.status >= 200 && service.response.status < 300 ? (
-                          <CheckCircle size={14} className="text-green-500" />
+                          <CheckCircle size={14} className="text-green-400" />
                         ) : (
-                          <XCircle size={14} className="text-red-500" />
+                          <XCircle size={14} className="text-bolt-accent-red" />
                         )}
                         <span className={getStatusColor(service.response.status)}>
                           {service.response.status} {service.response.statusText}
                         </span>
                       </div>
                       
-                      <div className="flex items-center gap-1 text-gray-500">
+                      <div className="flex items-center gap-1 text-bolt-text-secondary">
                         <Clock size={14} />
                         <span>{service.response.responseTime}ms</span>
                       </div>
@@ -232,17 +232,17 @@ export default function ServicesDashboard() {
 
                   {/* Tags */}
                   {service.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
+                    <div className="flex flex-wrap gap-2 mb-4">
                       {service.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full"
+                          className="px-2 py-1 text-xs bg-bolt-bg-surface-alt text-bolt-text-secondary rounded-full border border-bolt-divider"
                         >
                           {tag}
                         </span>
                       ))}
                       {service.tags.length > 3 && (
-                        <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+                        <span className="px-2 py-1 text-xs bg-bolt-bg-surface-alt text-bolt-text-secondary rounded-full border border-bolt-divider">
                           +{service.tags.length - 3}
                         </span>
                       )}
@@ -250,7 +250,7 @@ export default function ServicesDashboard() {
                   )}
 
                   {/* Metadata */}
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  <div className="text-xs text-bolt-text-secondary mb-4 flex-1">
                     <div className="flex items-center gap-1">
                       <Calendar size={12} />
                       <span>Updated {format(new Date(service.updatedAt), 'MMM d, yyyy')}</span>
@@ -258,10 +258,10 @@ export default function ServicesDashboard() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-auto">
                     <button
                       onClick={() => handleExecuteService(service)}
-                      className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 hover:scale-105"
                     >
                       <Play size={14} />
                       Test
@@ -269,7 +269,7 @@ export default function ServicesDashboard() {
                     
                     <button
                       onClick={() => handleEditService(service)}
-                      className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-200 hover:scale-105"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-bolt-text-secondary hover:bg-bolt-hover rounded-lg transition-all duration-200 hover:scale-105"
                     >
                       <Edit size={14} />
                       Edit
@@ -277,7 +277,7 @@ export default function ServicesDashboard() {
                     
                     <button
                       onClick={() => handleDeleteService(service)}
-                      className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
+                      className="p-2 text-bolt-text-secondary hover:text-bolt-accent-red hover:bg-bolt-accent-red/20 rounded-lg transition-all duration-200 hover:scale-110"
                       title="Delete"
                     >
                       <Trash2 size={14} />
@@ -287,40 +287,40 @@ export default function ServicesDashboard() {
               ))}
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-lg">
+            <div className="table">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                  <thead className="table-header">
                     <tr>
-                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
                         Name
                       </th>
-                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
                         Method
                       </th>
-                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
                         URL
                       </th>
-                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
                         Status
                       </th>
-                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
                         Updated
                       </th>
-                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                  <tbody className="divide-y divide-bolt-divider">
                     {services.map((service) => (
                       <tr key={service.id} className="table-row">
                         <td className="px-6 py-4">
                           <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            <div className="text-sm font-medium text-bolt-text-primary">
                               {service.name}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                            <div className="text-sm text-bolt-text-secondary truncate max-w-xs">
                               {service.description}
                             </div>
                           </div>
@@ -333,7 +333,7 @@ export default function ServicesDashboard() {
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 dark:text-white font-mono truncate max-w-xs">
+                          <div className="text-sm text-bolt-text-primary font-mono truncate max-w-xs">
                             {service.url}
                           </div>
                         </td>
@@ -342,21 +342,21 @@ export default function ServicesDashboard() {
                           {service.response ? (
                             <div className="flex items-center gap-2">
                               {service.response.status >= 200 && service.response.status < 300 ? (
-                                <CheckCircle size={14} className="text-green-500" />
+                                <CheckCircle size={14} className="text-green-400" />
                               ) : (
-                                <XCircle size={14} className="text-red-500" />
+                                <XCircle size={14} className="text-bolt-accent-red" />
                               )}
                               <span className={`text-sm ${getStatusColor(service.response.status)}`}>
                                 {service.response.status}
                               </span>
                             </div>
                           ) : (
-                            <span className="text-sm text-gray-400">Not tested</span>
+                            <span className="text-sm text-bolt-text-disabled">Not tested</span>
                           )}
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm text-bolt-text-secondary">
                             {format(new Date(service.updatedAt), 'MMM d, yyyy')}
                           </div>
                         </td>
@@ -365,26 +365,26 @@ export default function ServicesDashboard() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleExecuteService(service)}
-                              className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-200 hover:scale-110"
+                              className="p-2 text-green-400 hover:bg-green-600/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Test"
                             >
-                              <Play size={14} />
+                              <Play size={16} />
                             </button>
                             
                             <button
                               onClick={() => handleEditService(service)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 hover:scale-110"
+                              className="p-2 text-blue-400 hover:bg-blue-600/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Edit"
                             >
-                              <Edit size={14} />
+                              <Edit size={16} />
                             </button>
                             
                             <button
                               onClick={() => handleDeleteService(service)}
-                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
+                              className="p-2 text-bolt-accent-red hover:bg-bolt-accent-red/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Delete"
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         </td>
@@ -398,8 +398,8 @@ export default function ServicesDashboard() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-              <div className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="card flex items-center justify-between mt-6 p-4">
+              <div className="text-sm text-bolt-text-secondary">
                 Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} services
               </div>
               
@@ -407,7 +407,7 @@ export default function ServicesDashboard() {
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page === 1}
-                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
+                 className="p-2 text-bolt-text-secondary hover:text-bolt-text-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -418,8 +418,8 @@ export default function ServicesDashboard() {
                     onClick={() => handlePageChange(page)}
                     className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 hover:scale-105 ${
                       page === pagination.page
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? 'bg-bolt-accent-red text-white shadow-bolt'
+                        : 'text-bolt-text-secondary hover:bg-bolt-hover'
                     }`}
                   >
                     {page}
@@ -429,7 +429,7 @@ export default function ServicesDashboard() {
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page === pagination.totalPages}
-                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
+                 className="p-2 text-bolt-text-secondary hover:text-bolt-text-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
                 >
                   <ChevronRight size={20} />
                 </button>

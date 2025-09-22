@@ -5,6 +5,30 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Wells Fargo Bolt Theme
+        bolt: {
+          // Background Colors
+          'bg-primary': '#121212',
+          'bg-alt': '#1E1E1E',
+          'bg-surface': '#1A1A1A',
+          'bg-surface-alt': '#2A2A2A',
+          
+          // Text Colors
+          'text-primary': '#FFFFFF',
+          'text-default': '#E0E0E0',
+          'text-secondary': '#B0B0B0',
+          'text-disabled': '#666666',
+          
+          // Accent Colors (Wells Fargo)
+          'accent-red': '#C40404',
+          'accent-red-hover': '#E03535',
+          'accent-gold': '#FFD700',
+          
+          // Borders/States
+          'divider': '#2A2A2A',
+          'hover': 'rgba(255,255,255,0.08)',
+          'active': 'rgba(255,255,255,0.16)',
+        },
         // Wells Fargo Brand Colors
         primary: {
           50: '#fef2f2',
@@ -78,6 +102,12 @@ export default {
         'wells-red': '#d92d20',
         'wells-gold': '#f59e0b',
         // Success, Warning, Error
+      width: {
+        'card': '28rem',
+      },
+      borderRadius: {
+        'card': '1.25rem',
+      },
         success: '#10b981',
         warning: '#f59e0b',
         error: '#ef4444',
@@ -96,6 +126,8 @@ export default {
         'wells': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
         'wells-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'wells-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'bolt': '0 20px 40px -12px rgba(0, 0, 0, 0.8), 0 8px 16px -8px rgba(0, 0, 0, 0.6)',
+        'bolt-lg': '0 32px 64px -12px rgba(0, 0, 0, 0.9), 0 16px 32px -8px rgba(0, 0, 0, 0.7)',
         'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
         'glow-lg': '0 0 30px rgba(59, 130, 246, 0.4)',
       },

@@ -11,7 +11,7 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-bolt-bg-primary">
       {/* Sidebar - Always Visible */}
       <Sidebar isCollapsed={sidebarCollapsed} onToggle={toggleSidebar} />
       
