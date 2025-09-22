@@ -135,8 +135,8 @@ export default function ABTestList() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-bolt-text-primary">A/B Tests</h2>
-          <p className="text-bolt-text-secondary">Compare workflow performance and optimize your processes</p>
+          <h2 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary">A/B Tests</h2>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">Compare workflow performance and optimize your processes</p>
         </div>
         
         <button
@@ -151,20 +151,20 @@ export default function ABTestList() {
       {/* Filters */}
       <div className="card flex items-center gap-4 p-6">
         <div className="flex-1 relative">
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bolt-text-secondary" />
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-secondary dark:text-dark-text-secondary" />
           <input
             type="text"
             placeholder="Search A/B tests..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-bolt-surfaceAlt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-3 bg-light-surface dark:bg-dark-surface-alt border border-light-border dark:border-dark-border text-light-text-primary dark:text-dark-text-default rounded-lg focus:ring-2 focus:ring-wells-red focus:border-transparent transition-all duration-200"
           />
         </div>
         
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-3 bg-bolt-surfaceAlt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent"
+          className="px-4 py-3 bg-light-surface dark:bg-dark-surface-alt border border-light-border dark:border-dark-border text-light-text-primary dark:text-dark-text-default rounded-lg focus:ring-2 focus:ring-wells-red focus:border-transparent"
         >
           <option value="all">All Status</option>
           <option value="draft">Draft</option>
@@ -178,8 +178,8 @@ export default function ABTestList() {
             onClick={() => setViewMode('card')}
             className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'card'
-                ? 'bg-bolt-accent-red text-white shadow-bolt'
-                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
+                ? 'bg-wells-red text-white shadow-card'
+                : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary hover:bg-light-hover dark:hover:bg-dark-hover'
             }`}
           >
             <Grid size={20} />
@@ -188,8 +188,8 @@ export default function ABTestList() {
             onClick={() => setViewMode('table')}
             className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'table'
-                ? 'bg-bolt-accent-red text-white shadow-bolt'
-                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
+                ? 'bg-wells-red text-white shadow-card'
+                : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary hover:bg-light-hover dark:hover:bg-dark-hover'
             }`}
           >
             <List size={20} />
@@ -200,9 +200,9 @@ export default function ABTestList() {
       {/* A/B Tests Display */}
       {filteredABTests.length === 0 ? (
         <div className="text-center py-16">
-          <BarChart3 size={64} className="mx-auto mb-4 text-bolt-text-disabled opacity-50" />
-          <h3 className="text-xl font-medium text-bolt-text-primary mb-2">No A/B tests found</h3>
-          <p className="text-bolt-text-secondary mb-6">
+          <BarChart3 size={64} className="mx-auto mb-4 text-light-text-secondary dark:text-dark-text-secondary opacity-50" />
+          <h3 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-2">No A/B tests found</h3>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
             {searchTerm || statusFilter !== 'all' 
               ? 'Try adjusting your search or filters'
               : 'Create your first A/B test to compare workflow performance'
@@ -229,10 +229,10 @@ export default function ABTestList() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-bolt-text-primary mb-2 truncate">
+                      <h3 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2 truncate">
                         {test.name}
                       </h3>
-                      <p className="text-sm text-bolt-text-secondary line-clamp-2">
+                      <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary line-clamp-2">
                         {test.description}
                       </p>
                     </div>
@@ -245,16 +245,16 @@ export default function ABTestList() {
 
                   {/* Metrics Overview */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-bolt-surfaceAlt p-3 rounded-lg border border-bolt-divider">
-                      <div className="text-xs text-bolt-text-secondary mb-1">Total Executions</div>
-                      <div className="text-lg font-bold text-bolt-accent-gold">
+                    <div className="bg-light-surface dark:bg-dark-surface-alt p-3 rounded-lg border border-light-border dark:border-dark-border">
+                      <div className="text-xs text-light-text-secondary dark:text-dark-text-secondary mb-1">Total Executions</div>
+                      <div className="text-lg font-bold text-wells-gold">
                         {test.metrics.totalExecutions.toLocaleString()}
                       </div>
                     </div>
                     
-                    <div className="bg-bolt-surfaceAlt p-3 rounded-lg border border-bolt-divider">
-                      <div className="text-xs text-bolt-text-secondary mb-1">Traffic Split</div>
-                      <div className="text-lg font-bold text-bolt-text-primary">
+                    <div className="bg-light-surface dark:bg-dark-surface-alt p-3 rounded-lg border border-light-border dark:border-dark-border">
+                      <div className="text-xs text-light-text-secondary dark:text-dark-text-secondary mb-1">Traffic Split</div>
+                      <div className="text-lg font-bold text-light-text-primary dark:text-dark-text-primary">
                         {test.trafficSplit}% / {100 - test.trafficSplit}%
                       </div>
                     </div>
@@ -266,7 +266,7 @@ export default function ABTestList() {
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-blue-400">Variant A</span>
                         {test.status === 'completed' && calculateWinner(test) === 'A' && (
-                          <TrendingUp size={14} className="text-bolt-accent-gold" />
+                          <TrendingUp size={14} className="text-wells-gold" />
                         )}
                       </div>
                       <div className="space-y-1">
@@ -283,7 +283,7 @@ export default function ABTestList() {
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-green-400">Variant B</span>
                         {test.status === 'completed' && calculateWinner(test) === 'B' && (
-                          <TrendingUp size={14} className="text-bolt-accent-gold" />
+                          <TrendingUp size={14} className="text-wells-gold" />
                         )}
                       </div>
                       <div className="space-y-1">
@@ -298,7 +298,7 @@ export default function ABTestList() {
                   </div>
 
                   {/* Metadata */}
-                  <div className="space-y-1 mb-4 text-xs text-bolt-text-secondary">
+                  <div className="space-y-1 mb-4 text-xs text-light-text-secondary dark:text-dark-text-secondary">
                     <div className="flex items-center gap-2">
                       <Calendar size={12} />
                       <span>Started {format(new Date(test.startDate), 'MMM d, yyyy')}</span>
@@ -325,7 +325,7 @@ export default function ABTestList() {
                     {test.status === 'running' && (
                       <button
                         onClick={() => handlePauseTest(test)}
-                        className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-bolt-accent-gold text-black hover:bg-yellow-500 rounded-lg transition-all duration-200 hover:scale-105"
+                        className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-wells-gold text-black hover:bg-yellow-500 rounded-lg transition-all duration-200 hover:scale-105"
                       >
                         <Pause size={14} />
                         Pause
@@ -334,7 +334,7 @@ export default function ABTestList() {
                     
                     <button
                       onClick={() => setCurrentABTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-bolt-text-secondary hover:bg-bolt-hover rounded-lg transition-all duration-200 hover:scale-105 ml-auto"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover dark:hover:bg-dark-hover rounded-lg transition-all duration-200 hover:scale-105 ml-auto"
                     >
                       <BarChart3 size={14} />
                       Details
@@ -349,38 +349,38 @@ export default function ABTestList() {
                 <table className="w-full">
                   <thead className="table-header">
                     <tr>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Name
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Status
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Traffic Split
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Total Executions
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Success Rate A/B
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Created By
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-bolt-divider">
+                  <tbody className="divide-y divide-light-border dark:divide-dark-border">
                     {filteredABTests.map((test) => (
                       <tr key={test.id} className="table-row">
                         <td className="px-6 py-4">
                           <div>
-                            <div className="text-sm font-medium text-bolt-text-primary">
+                            <div className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                               {test.name}
                             </div>
-                            <div className="text-sm text-bolt-text-secondary truncate max-w-xs">
+                            <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary truncate max-w-xs">
                               {test.description}
                             </div>
                           </div>
@@ -394,25 +394,25 @@ export default function ABTestList() {
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-primary">
+                          <div className="text-sm text-light-text-primary dark:text-dark-text-primary">
                             {test.trafficSplit}% / {100 - test.trafficSplit}%
                           </div>
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-accent-gold font-semibold">
+                          <div className="text-sm text-wells-gold font-semibold">
                             {test.metrics.totalExecutions.toLocaleString()}
                           </div>
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-primary">
+                          <div className="text-sm text-light-text-primary dark:text-dark-text-primary">
                             {(test.metrics.groupASuccessRate * 100).toFixed(1)}% / {(test.metrics.groupBSuccessRate * 100).toFixed(1)}%
                           </div>
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-primary">
+                          <div className="text-sm text-light-text-primary dark:text-dark-text-primary">
                             {test.createdBy}
                           </div>
                         </td>
@@ -432,7 +432,7 @@ export default function ABTestList() {
                             {test.status === 'running' && (
                               <button
                                 onClick={() => handlePauseTest(test)}
-                                className="p-2 text-bolt-accent-gold hover:bg-yellow-600/20 rounded-lg transition-all duration-200 hover:scale-110"
+                                className="p-2 text-wells-gold hover:bg-yellow-100 dark:hover:bg-yellow-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                                 title="Pause"
                               >
                                 <Pause size={16} />
@@ -441,7 +441,7 @@ export default function ABTestList() {
                             
                             <button
                               onClick={() => setCurrentABTest(test)}
-                              className="p-2 text-bolt-accent-red hover:bg-bolt-accent-red/20 rounded-lg transition-all duration-200 hover:scale-110"
+                              className="p-2 text-wells-red hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="View Details"
                             >
                               <BarChart3 size={16} />

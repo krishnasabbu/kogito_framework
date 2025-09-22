@@ -10,17 +10,6 @@
   --toast-bg: #ffffff;
   --toast-color: #1f2937;
   --toast-border: #e5e7eb;
-  
-  /* Wells Fargo Brand Colors */
-  --wells-red: #d92d20;
-  --wells-gold: #f59e0b;
-  
-  /* Professional spacing */
-  --wells-spacing-xs: 0.25rem;
-  --wells-spacing-sm: 0.5rem;
-  --wells-spacing-md: 1rem;
-  --wells-spacing-lg: 1.5rem;
-  --wells-spacing-xl: 2rem;
 }
 
 .dark {
@@ -41,69 +30,60 @@ body {
 
 /* Professional button styles */
 .btn-primary {
-  @apply bg-gradient-to-r from-bolt-accent-red to-bolt-accent-gold hover:from-bolt-accent-red-hover hover:to-yellow-500 text-white font-medium px-6 py-3 rounded-xl shadow-bolt transition-all duration-200 hover:scale-105 hover:shadow-bolt-lg;
+  @apply bg-wells-red hover:bg-wells-red-hover text-white font-medium px-6 py-3 rounded-xl shadow-card transition-all duration-200 hover:scale-105;
 }
 
 .btn-secondary {
-  @apply bg-bolt-surfaceAlt hover:bg-bolt-hover text-bolt-text-default font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105;
+  @apply bg-light-surface dark:bg-dark-surface-alt hover:bg-light-hover dark:hover:bg-dark-hover text-light-text-primary dark:text-dark-text-default font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105 border border-light-border dark:border-dark-border;
 }
 
 .btn-outline {
-  @apply border border-bolt-divider hover:bg-bolt-hover text-bolt-text-secondary font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105;
+  @apply border border-light-border dark:border-dark-border hover:bg-light-hover dark:hover:bg-dark-hover text-light-text-secondary dark:text-dark-text-secondary font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105;
 }
 
 /* Professional card styles */
 .card {
-  @apply w-card bg-bolt-surface text-bolt-text-default border border-bolt-divider rounded-card shadow-bolt backdrop-blur-sm;
+  @apply w-card bg-white dark:bg-dark-surface text-light-text-primary dark:text-dark-text-default border border-light-border dark:border-dark-border rounded-card shadow-card dark:shadow-card-dark;
 }
 
 .card-hover {
-  @apply card hover:shadow-bolt-lg hover:scale-105 hover:bg-bolt-hover transition-all duration-300;
+  @apply card hover:shadow-lg dark:hover:shadow-card-dark hover:scale-105 hover:bg-light-hover dark:hover:bg-dark-hover transition-all duration-300;
 }
 
 /* Professional input styles */
 .input {
-  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500;
+  @apply w-full px-4 py-3 border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-light-text-primary dark:text-dark-text-default rounded-lg focus:ring-2 focus:ring-wells-red focus:border-transparent transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500;
 }
 
 /* Professional tab styles */
 .tab {
-  @apply px-6 py-3 font-medium text-bolt-text-secondary hover:text-bolt-text-primary border-b-2 border-transparent hover:border-bolt-divider transition-all duration-200 hover:scale-105;
+  @apply px-6 py-3 font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary border-b-2 border-transparent hover:border-light-border dark:hover:border-dark-border transition-all duration-200 hover:scale-105;
 }
 
 .tab-active {
-  @apply px-6 py-3 font-medium text-bolt-accent-red border-b-2 border-bolt-accent-red bg-bolt-active;
+  @apply px-6 py-3 font-medium text-wells-red border-b-2 border-wells-red bg-light-hover dark:bg-dark-hover;
 }
 
 /* Professional navigation styles */
 .nav-item {
-  @apply flex items-center gap-3 px-4 py-3 text-bolt-text-secondary hover:bg-bolt-hover rounded-xl transition-all duration-200 hover:scale-105;
+  @apply flex items-center gap-3 px-4 py-3 text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover dark:hover:bg-dark-hover rounded-xl transition-all duration-200 hover:scale-105;
 }
 
 .nav-item-active {
-  @apply flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-bolt-accent-red to-bolt-accent-gold text-white rounded-xl shadow-bolt;
+  @apply flex items-center gap-3 px-4 py-3 bg-wells-red text-white rounded-xl shadow-card;
 }
 
 /* Professional table styles */
 .table {
-  @apply w-full bg-bolt-surface border border-bolt-divider rounded-xl overflow-hidden shadow-bolt;
+  @apply w-full bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-xl overflow-hidden shadow-card dark:shadow-card-dark;
 }
 
 .table-header {
-  @apply bg-gray-800 border-b border-gray-700;
+  @apply bg-light-surface dark:bg-dark-surface-alt border-b border-light-border dark:border-dark-border;
 }
 
 .table-row {
-  @apply border-b border-bolt-divider hover:bg-bolt-hover transition-all duration-200;
-}
-
-/* Enhanced glassmorphism effects */
-.glass-card {
-  @apply backdrop-blur-lg bg-bolt-surface/80 border border-bolt-divider/50 shadow-bolt-lg;
-}
-
-.glass-button {
-  @apply backdrop-blur-sm bg-bolt-hover border border-bolt-divider/50 hover:bg-bolt-active transition-all duration-200;
+  @apply border-b border-light-border dark:border-dark-border hover:bg-light-hover dark:hover:bg-dark-hover transition-all duration-200;
 }
 
 /* Enhanced animations */
@@ -117,25 +97,12 @@ body {
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-  50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+  0%, 100% { box-shadow: 0 0 20px rgba(196, 4, 4, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(196, 4, 4, 0.6); }
 }
 
 .animate-glow {
   animation: glow 2s ease-in-out infinite;
-}
-
-/* Enhanced gradients */
-.gradient-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
-}
-
-.gradient-surface {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-}
-
-.dark .gradient-surface {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
 }
 
 /* Status indicators */
@@ -199,23 +166,5 @@ body {
 
 /* Professional focus styles */
 .focus-wells {
-  @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
-}
-
-/* Loading animation */
-.animate-pulse-slow {
-  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Professional gradient backgrounds */
-.gradient-wells {
-  background: linear-gradient(135deg, #d92d20 0%, #f59e0b 100%);
-}
-
-.gradient-wells-subtle {
-  background: linear-gradient(135deg, #fef2f2 0%, #fffbeb 100%);
-}
-
-.dark .gradient-wells-subtle {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  @apply focus:outline-none focus:ring-2 focus:ring-wells-red focus:ring-offset-2 dark:focus:ring-offset-gray-800;
 }

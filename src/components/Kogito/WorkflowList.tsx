@@ -157,8 +157,8 @@ export default function WorkflowList() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-bolt-text-primary">Workflows</h2>
-          <p className="text-bolt-text-secondary">Manage and execute your business processes</p>
+          <h2 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary">Workflows</h2>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">Manage and execute your business processes</p>
         </div>
         
         <button
@@ -173,20 +173,20 @@ export default function WorkflowList() {
       {/* Filters and Search */}
       <div className="card flex items-center gap-4 p-6">
         <div className="flex-1 relative">
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bolt-text-secondary" />
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-secondary dark:text-dark-text-secondary" />
           <input
             type="text"
             placeholder="Search workflows..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-bolt-bg-surface-alt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-3 bg-light-surface dark:bg-dark-surface-alt border border-light-border dark:border-dark-border text-light-text-primary dark:text-dark-text-default rounded-lg focus:ring-2 focus:ring-wells-red focus:border-transparent transition-all duration-200"
           />
         </div>
         
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-3 bg-bolt-bg-surface-alt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent"
+          className="px-4 py-3 bg-light-surface dark:bg-dark-surface-alt border border-light-border dark:border-dark-border text-light-text-primary dark:text-dark-text-default rounded-lg focus:ring-2 focus:ring-wells-red focus:border-transparent"
         >
           <option value="all">All Status</option>
           <option value="draft">Draft</option>
@@ -201,7 +201,7 @@ export default function WorkflowList() {
             setSortBy(field as any);
             setSortOrder(order as any);
           }}
-          className="px-4 py-3 bg-bolt-bg-surface-alt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent"
+          className="px-4 py-3 bg-light-surface dark:bg-dark-surface-alt border border-light-border dark:border-dark-border text-light-text-primary dark:text-dark-text-default rounded-lg focus:ring-2 focus:ring-wells-red focus:border-transparent"
         >
           <option value="updatedAt-desc">Recently Updated</option>
           <option value="createdAt-desc">Recently Created</option>
@@ -214,8 +214,8 @@ export default function WorkflowList() {
             onClick={() => setViewMode('card')}
             className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'card'
-                ? 'bg-bolt-accent-red text-white shadow-bolt'
-                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
+                ? 'bg-wells-red text-white shadow-card'
+                : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary hover:bg-light-hover dark:hover:bg-dark-hover'
             }`}
           >
             <Grid size={20} />
@@ -224,8 +224,8 @@ export default function WorkflowList() {
             onClick={() => setViewMode('table')}
             className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'table'
-                ? 'bg-bolt-accent-red text-white shadow-bolt'
-                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
+                ? 'bg-wells-red text-white shadow-card'
+                : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary hover:bg-light-hover dark:hover:bg-dark-hover'
             }`}
           >
             <List size={20} />
@@ -236,9 +236,9 @@ export default function WorkflowList() {
       {/* Workflow Display */}
       {filteredWorkflows.length === 0 ? (
         <div className="text-center py-16">
-          <Activity size={64} className="mx-auto mb-4 text-bolt-text-disabled opacity-50" />
-          <h3 className="text-xl font-medium text-bolt-text-primary mb-2">No workflows found</h3>
-          <p className="text-bolt-text-secondary mb-6">
+          <Activity size={64} className="mx-auto mb-4 text-light-text-secondary dark:text-dark-text-secondary opacity-50" />
+          <h3 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-2">No workflows found</h3>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
             {searchTerm || statusFilter !== 'all' 
               ? 'Try adjusting your search or filters'
               : 'Create your first workflow to get started'
@@ -265,10 +265,10 @@ export default function WorkflowList() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-bolt-text-primary mb-2 truncate">
+                      <h3 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2 truncate">
                         {workflow.name}
                       </h3>
-                      <p className="text-sm text-bolt-text-secondary line-clamp-2">
+                      <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary line-clamp-2">
                         {workflow.description}
                       </p>
                     </div>
@@ -279,7 +279,7 @@ export default function WorkflowList() {
                   </div>
 
                   {/* Metadata */}
-                  <div className="space-y-2 mb-4 text-sm text-bolt-text-secondary flex-1">
+                  <div className="space-y-2 mb-4 text-sm text-light-text-secondary dark:text-dark-text-secondary flex-1">
                     <div className="flex items-center gap-2">
                       <User size={14} />
                       <span className="truncate">{workflow.createdBy}</span>
@@ -302,13 +302,13 @@ export default function WorkflowList() {
                       {workflow.tags.slice(0, 2).map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded-full border border-blue-600/30"
+                          className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full border border-blue-200 dark:border-blue-800"
                         >
                           {tag}
                         </span>
                       ))}
                       {workflow.tags.length > 2 && (
-                        <span className="px-2 py-1 text-xs bg-bolt-bg-surface-alt text-bolt-text-secondary rounded-full border border-bolt-divider">
+                        <span className="px-2 py-1 text-xs bg-light-surface dark:bg-dark-surface-alt text-light-text-secondary dark:text-dark-text-secondary rounded-full border border-light-border dark:border-dark-border">
                           +{workflow.tags.length - 2}
                         </span>
                       )}
@@ -319,7 +319,7 @@ export default function WorkflowList() {
                   <div className="flex items-center gap-2 mt-auto">
                     <button
                       onClick={() => handleEditWorkflow(workflow)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-bolt-text-secondary hover:bg-bolt-hover rounded-lg transition-all duration-200 hover:scale-105"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover dark:hover:bg-dark-hover rounded-lg transition-all duration-200 hover:scale-105"
                     >
                       <Edit size={14} />
                       Edit
@@ -337,7 +337,7 @@ export default function WorkflowList() {
                     
                     <button
                       onClick={() => handleDuplicateWorkflow(workflow)}
-                      className="p-2 text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover rounded-lg transition-all duration-200 hover:scale-110"
+                      className="p-2 text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover dark:hover:bg-dark-hover rounded-lg transition-all duration-200 hover:scale-110"
                       title="Duplicate"
                     >
                       <Copy size={14} />
@@ -345,7 +345,7 @@ export default function WorkflowList() {
                     
                     <button
                       onClick={() => handleDeleteWorkflow(workflow)}
-                      className="p-2 text-bolt-text-secondary hover:text-bolt-accent-red hover:bg-bolt-accent-red/20 rounded-lg transition-all duration-200 hover:scale-110"
+                      className="p-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-wells-red hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                       title="Delete"
                     >
                       <Trash2 size={14} />
@@ -360,35 +360,35 @@ export default function WorkflowList() {
                 <table className="w-full">
                   <thead className="table-header">
                     <tr>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Name
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Status
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Version
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Created By
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Updated
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-bolt-divider">
+                  <tbody className="divide-y divide-light-border dark:divide-dark-border">
                     {filteredWorkflows.map((workflow) => (
                       <tr key={workflow.id} className="table-row">
                         <td className="px-6 py-4">
                           <div>
-                            <div className="text-sm font-medium text-bolt-text-primary">
+                            <div className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                               {workflow.name}
                             </div>
-                            <div className="text-sm text-bolt-text-secondary truncate max-w-xs">
+                            <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary truncate max-w-xs">
                               {workflow.description}
                             </div>
                           </div>
@@ -401,19 +401,19 @@ export default function WorkflowList() {
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-primary">
+                          <div className="text-sm text-light-text-primary dark:text-dark-text-primary">
                             v{workflow.version}
                           </div>
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-primary">
+                          <div className="text-sm text-light-text-primary dark:text-dark-text-primary">
                             {workflow.createdBy}
                           </div>
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-secondary">
+                          <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                             {format(new Date(workflow.updatedAt), 'MMM d, yyyy')}
                           </div>
                         </td>
@@ -440,7 +440,7 @@ export default function WorkflowList() {
                             
                             <button
                               onClick={() => handleDuplicateWorkflow(workflow)}
-                              className="p-2 text-bolt-text-secondary hover:bg-bolt-hover rounded-lg transition-all duration-200 hover:scale-110"
+                              className="p-2 text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover dark:hover:bg-dark-hover rounded-lg transition-all duration-200 hover:scale-110"
                               title="Duplicate"
                             >
                               <Copy size={16} />
@@ -448,7 +448,7 @@ export default function WorkflowList() {
                             
                             <button
                               onClick={() => handleDeleteWorkflow(workflow)}
-                              className="p-2 text-bolt-accent-red hover:bg-bolt-accent-red/20 rounded-lg transition-all duration-200 hover:scale-110"
+                              className="p-2 text-wells-red hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Delete"
                             >
                               <Trash2 size={16} />
