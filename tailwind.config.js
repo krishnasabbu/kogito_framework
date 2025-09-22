@@ -103,15 +103,13 @@ export default {
         'wells-red': '#d92d20',
         'wells-gold': '#f59e0b',
         // Success, Warning, Error
-      }
-      width: {
-        'card': '28rem',
       },
       width: {
         'card': '28rem',
       },
       borderRadius: {
         'card': '1.25rem',
+        'wells': '0.75rem',
       },
       boxShadow: {
         'wells': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
@@ -121,9 +119,6 @@ export default {
         'bolt-lg': '0 32px 64px -12px rgba(0, 0, 0, 0.9), 0 16px 32px -8px rgba(0, 0, 0, 0.7)',
         'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
         'glow-lg': '0 0 30px rgba(59, 130, 246, 0.4)',
-      },
-      borderRadius: {
-        'wells': '0.75rem',
       },
       fontFamily: {
         'wells': ['Inter', 'system-ui', 'sans-serif'],
