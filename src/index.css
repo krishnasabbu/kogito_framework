@@ -86,7 +86,7 @@ body {
 
 /* Professional table styles */
 .table {
-  @apply w-full bg-bolt-bg-surface border border-bolt-divider rounded-xl overflow-hidden shadow-bolt;
+  @apply w-full bg-bolt-surface border border-bolt-divider rounded-xl overflow-hidden shadow-bolt;
 }
 
 .table-header {
