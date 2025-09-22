@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Inter font for professional look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CSS Variables for theme support */
+:root {
+  --toast-bg: #ffffff;
+  --toast-color: #1f2937;
+  --toast-border: #e5e7eb;
+  
+  /* Wells Fargo Brand Colors */
+  --wells-red: #d92d20;
+  --wells-gold: #f59e0b;
+  
+  /* Professional spacing */
+  --wells-spacing-xs: 0.25rem;
+  --wells-spacing-sm: 0.5rem;
+  --wells-spacing-md: 1rem;
+  --wells-spacing-lg: 1.5rem;
+  --wells-spacing-xl: 2rem;
+}
+
+.dark {
+  --toast-bg: #1f2937;
+  --toast-color: #f9fafb;
+  --toast-border: #374151;
+}
+
+/* Base styles */
+* {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  @apply antialiased;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* Professional button styles */
+.btn-primary {
+  @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-4 py-2 rounded-wells shadow-wells transition-all duration-200;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium px-4 py-2 rounded-wells transition-all duration-200;
+}
+
+.btn-outline {
+  @apply border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium px-4 py-2 rounded-wells transition-all duration-200;
+}
+
+/* Professional card styles */
+.card {
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-wells shadow-wells;
+}
+
+.card-hover {
+  @apply card hover:shadow-wells-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200;
+}
+
+/* Professional input styles */
+.input {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-wells focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+}
+
+/* Professional tab styles */
+.tab {
+  @apply px-4 py-3 font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200;
+}
+
+.tab-active {
+  @apply px-4 py-3 font-medium text-primary-600 dark:text-primary-400 border-b-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20;
+}
+
+/* Professional navigation styles */
+.nav-item {
+  @apply flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-wells transition-all duration-200;
+}
+
+.nav-item-active {
+  @apply flex items-center gap-3 px-4 py-3 bg-primary-500 text-white rounded-wells shadow-wells;
+}
+
+/* Professional table styles */
+.table {
+  @apply w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-wells overflow-hidden;
+}
+
+.table-header {
+  @apply bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600;
+}
+
+.table-row {
+  @apply border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150;
+}
+
+/* Status indicators */
+.status-success {
+  @apply bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-error {
+  @apply bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-warning {
+  @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-info {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+/* Professional scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 #f3f4f6;
+}
+
+.dark .scrollbar-thin {
+  scrollbar-color: #4b5563 #1f2937;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Professional focus styles */
+.focus-wells {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
+}
+
+/* Loading animation */
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Professional gradient backgrounds */
+.gradient-wells {
+  background: linear-gradient(135deg, #d92d20 0%, #f59e0b 100%);
+}
+
+.gradient-wells-subtle {
+  background: linear-gradient(135deg, #fef2f2 0%, #fffbeb 100%);
+}
+
+.dark .gradient-wells-subtle {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}

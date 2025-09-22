@@ -1,0 +1,443 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Plus, 
+  Search, 
+  Grid, 
+  List, 
+  Play, 
+  Edit, 
+  Trash2, 
+  Clock,
+  CheckCircle,
+  XCircle,
+  Tag,
+  Calendar,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
+import { useServicesStore } from '../../stores/servicesStore';
+import { Service } from '../../types/services';
+import { format } from 'date-fns';
+import toast from 'react-hot-toast';
+
+export default function ServicesDashboard() {
+  const navigate = useNavigate();
+  const {
+    services,
+    isLoading,
+    viewMode,
+    searchTerm,
+    pagination,
+    loadServices,
+    deleteService,
+    executeService,
+    setViewMode,
+    setSearchTerm,
+    setPagination
+  } = useServicesStore();
+
+  useEffect(() => {
+    loadServices();
+  }, [loadServices, searchTerm, pagination.page]);
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    setPagination({ page: 1 });
+  };
+
+  const handlePageChange = (page: number) => {
+    setPagination({ page });
+  };
+
+  const handleEditService = (service: Service) => {
+    navigate(`/services/${service.id}/edit`);
+  };
+
+  const handleDeleteService = async (service: Service) => {
+    if (window.confirm(`Are you sure you want to delete "${service.name}"?`)) {
+      try {
+        await deleteService(service.id);
+        toast.success('Service deleted successfully');
+      } catch (error) {
+        toast.error('Failed to delete service');
+      }
+    }
+  };
+
+  const handleExecuteService = async (service: Service) => {
+    try {
+      await executeService(service);
+      toast.success('Service executed successfully');
+    } catch (error) {
+      toast.error('Failed to execute service');
+    }
+  };
+
+  const getStatusColor = (status?: number) => {
+    if (!status) return 'text-gray-400';
+    if (status >= 200 && status < 300) return 'text-green-500';
+    if (status >= 400) return 'text-red-500';
+    return 'text-yellow-500';
+  };
+
+  const getMethodColor = (method: string) => {
+    switch (method) {
+      case 'GET': return 'bg-blue-100 text-blue-800';
+      case 'POST': return 'bg-green-100 text-green-800';
+      case 'PUT': return 'bg-yellow-100 text-yellow-800';
+      case 'DELETE': return 'bg-red-100 text-red-800';
+      case 'PATCH': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Services</h2>
+          <p className="text-gray-600 dark:text-gray-400">Manage and test your API services</p>
+        </div>
+        
+        <button
+          onClick={() => navigate('/services/new')}
+          className="btn-primary flex items-center gap-2 px-6 py-3"
+        >
+          <Plus size={20} />
+          Add Service
+        </button>
+      </div>
+
+      {/* Search and View Controls */}
+      <div className="card flex items-center gap-4 p-4">
+        <div className="flex-1 relative">
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search services..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="input pl-10"
+          />
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode('card')}
+            className={`p-2 rounded-lg transition-all duration-200 focus-wells ${
+              viewMode === 'card'
+                ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            <Grid size={20} />
+          </button>
+          <button
+            onClick={() => setViewMode('table')}
+            className={`p-2 rounded-lg transition-all duration-200 focus-wells ${
+              viewMode === 'table'
+                ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            <List size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* Services Display */}
+      {services.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Plus size={32} className="text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No services found</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {searchTerm ? 'Try adjusting your search terms' : 'Create your first service to get started'}
+          </p>
+          {!searchTerm && (
+            <button
+              onClick={() => navigate('/services/new')}
+              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+            >
+              Add Service
+            </button>
+          )}
+        </div>
+      ) : (
+        <>
+          {viewMode === 'card' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="card-hover p-6"
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                        {service.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                        {service.description}
+                      </p>
+                    </div>
+                    
+                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${getMethodColor(service.method)}`}>
+                      {service.method}
+                    </span>
+                  </div>
+
+                  {/* URL */}
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate font-mono">
+                      {service.url}
+                    </p>
+                  </div>
+
+                  {/* Status */}
+                  {service.response && (
+                    <div className="flex items-center gap-4 mb-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        {service.response.status >= 200 && service.response.status < 300 ? (
+                          <CheckCircle size={14} className="text-green-500" />
+                        ) : (
+                          <XCircle size={14} className="text-red-500" />
+                        )}
+                        <span className={getStatusColor(service.response.status)}>
+                          {service.response.status} {service.response.statusText}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <Clock size={14} />
+                        <span>{service.response.responseTime}ms</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tags */}
+                  {service.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {service.tags.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {service.tags.length > 3 && (
+                        <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+                          +{service.tags.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Metadata */}
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    <div className="flex items-center gap-1">
+                      <Calendar size={12} />
+                      <span>Updated {format(new Date(service.updatedAt), 'MMM d, yyyy')}</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleExecuteService(service)}
+                      className="btn-primary bg-green-600 hover:bg-green-700 flex items-center gap-1 px-4 py-2 text-sm"
+                    >
+                      <Play size={14} />
+                      Test
+                    </button>
+                    
+                    <button
+                      onClick={() => handleEditService(service)}
+                      className="btn-secondary flex items-center gap-1 px-4 py-2 text-sm"
+                    >
+                      <Edit size={14} />
+                      Edit
+                    </button>
+                    
+                    <button
+                      onClick={() => handleDeleteService(service)}
+                      className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 focus-wells"
+                      title="Delete"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="table">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="table-header">
+                    <tr>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Name
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Method
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        URL
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Status
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Updated
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                    {services.map((service) => (
+                      <tr key={service.id} className="table-row">
+                        <td className="px-6 py-4">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {service.name}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                              {service.description}
+                            </div>
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${getMethodColor(service.method)}`}>
+                            {service.method}
+                          </span>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 dark:text-white font-mono truncate max-w-xs">
+                            {service.url}
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          {service.response ? (
+                            <div className="flex items-center gap-2">
+                              {service.response.status >= 200 && service.response.status < 300 ? (
+                                <CheckCircle size={14} className="text-green-500" />
+                              ) : (
+                                <XCircle size={14} className="text-red-500" />
+                              )}
+                              <span className={`text-sm ${getStatusColor(service.response.status)}`}>
+                                {service.response.status}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">Not tested</span>
+                          )}
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {format(new Date(service.updatedAt), 'MMM d, yyyy')}
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleExecuteService(service)}
+                              className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-200 focus-wells"
+                              title="Test"
+                            >
+                              <Play size={14} />
+                            </button>
+                            
+                            <button
+                              onClick={() => handleEditService(service)}
+                              className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-200 focus-wells"
+                              title="Edit"
+                            >
+                              <Edit size={14} />
+                            </button>
+                            
+                            <button
+                              onClick={() => handleDeleteService(service)}
+                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 focus-wells"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} services
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page === 1}
+                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 focus-wells"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 focus-wells ${
+                      page === pagination.page
+                        ? 'bg-primary-500 text-white shadow-wells'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                
+                <button
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page === pagination.totalPages}
+                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 focus-wells"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
