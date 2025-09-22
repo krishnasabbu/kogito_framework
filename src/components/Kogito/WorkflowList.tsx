@@ -210,7 +210,7 @@ export default function WorkflowList() {
 
       {/* Workflow Grid */}
       {filteredWorkflows.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-16">
           <Activity size={48} className="mx-auto mb-4 text-text-muted opacity-50" />
           <h3 className="text-lg font-medium text-text-primary mb-2">No workflows found</h3>
           <p className="text-text-muted mb-4">
@@ -229,11 +229,11 @@ export default function WorkflowList() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
           {filteredWorkflows.map((workflow) => (
             <div
               key={workflow.id}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-200"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
@@ -292,7 +292,7 @@ export default function WorkflowList() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleEditWorkflow(workflow)}
-                  className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                  className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-105"
                 >
                   <Edit size={14} />
                   Edit
@@ -301,7 +301,7 @@ export default function WorkflowList() {
                 {workflow.status === 'active' && (
                   <button
                     onClick={() => handleExecuteWorkflow(workflow)}
-                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-lg shadow-lg transition-all duration-200"
+                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-lg shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
                   >
                     <Play size={14} />
                     Run
@@ -311,7 +311,7 @@ export default function WorkflowList() {
                 <div className="flex items-center gap-1 ml-auto">
                   <button
                     onClick={() => handleDuplicateWorkflow(workflow)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-110"
                     title="Duplicate"
                   >
                     <Copy size={14} />
@@ -319,7 +319,7 @@ export default function WorkflowList() {
                   
                   <button
                     onClick={() => handleDeleteWorkflow(workflow)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
+                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                     title="Delete"
                   >
                     <Trash2 size={14} />

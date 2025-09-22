@@ -160,7 +160,7 @@ export default function ServicesDashboard() {
 
       {/* Services Display */}
       {services.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-16">
           <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <Plus size={32} className="text-gray-400" />
           </div>
@@ -180,11 +180,11 @@ export default function ServicesDashboard() {
       ) : (
         <>
           {viewMode === 'card' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
               {services.map((service) => (
                 <div
                   key={service.id}
-                  className="card-hover p-6"
+                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
@@ -261,7 +261,7 @@ export default function ServicesDashboard() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleExecuteService(service)}
-                      className="btn-primary bg-green-600 hover:bg-green-700 flex items-center gap-1 px-4 py-2 text-sm"
+                      className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
                     >
                       <Play size={14} />
                       Test
@@ -269,7 +269,7 @@ export default function ServicesDashboard() {
                     
                     <button
                       onClick={() => handleEditService(service)}
-                      className="btn-secondary flex items-center gap-1 px-4 py-2 text-sm"
+                      className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-200 hover:scale-105"
                     >
                       <Edit size={14} />
                       Edit
@@ -277,7 +277,7 @@ export default function ServicesDashboard() {
                     
                     <button
                       onClick={() => handleDeleteService(service)}
-                      className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 focus-wells"
+                      className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                       title="Delete"
                     >
                       <Trash2 size={14} />
@@ -287,10 +287,10 @@ export default function ServicesDashboard() {
               ))}
             </div>
           ) : (
-            <div className="table">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-lg">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="table-header">
+                  <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                     <tr>
                       <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
                         Name
@@ -365,7 +365,7 @@ export default function ServicesDashboard() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleExecuteService(service)}
-                              className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-200 focus-wells"
+                              className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Test"
                             >
                               <Play size={14} />
@@ -373,7 +373,7 @@ export default function ServicesDashboard() {
                             
                             <button
                               onClick={() => handleEditService(service)}
-                              className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-200 focus-wells"
+                              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Edit"
                             >
                               <Edit size={14} />
@@ -381,7 +381,7 @@ export default function ServicesDashboard() {
                             
                             <button
                               onClick={() => handleDeleteService(service)}
-                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 focus-wells"
+                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Delete"
                             >
                               <Trash2 size={14} />
@@ -398,7 +398,7 @@ export default function ServicesDashboard() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-6 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} services
               </div>
@@ -407,7 +407,7 @@ export default function ServicesDashboard() {
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page === 1}
-                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 focus-wells"
+                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -416,9 +416,9 @@ export default function ServicesDashboard() {
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 focus-wells ${
+                    className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 hover:scale-105 ${
                       page === pagination.page
-                        ? 'bg-primary-500 text-white shadow-wells'
+                        ? 'bg-blue-600 text-white shadow-lg'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
@@ -429,7 +429,7 @@ export default function ServicesDashboard() {
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page === pagination.totalPages}
-                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 focus-wells"
+                 className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
                 >
                   <ChevronRight size={20} />
                 </button>

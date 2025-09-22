@@ -72,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group ${
                     isActive
-                      ? 'bg-primary-500 text-white shadow-wells'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                   }`
                 }
@@ -80,12 +80,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
               >
                 <Icon size={20} className="flex-shrink-0" />
                 {!isCollapsed && (
-                  <span className="font-medium truncate">{label}</span>
+                  <span className="font-medium truncate transition-all duration-200">{label}</span>
                 )}
                 
                 {/* Tooltip for collapsed state */}
                 {isCollapsed && (
-                  <div className="absolute left-16 bg-gray-900 dark:bg-gray-700 text-white text-sm px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                  <div className="absolute left-16 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl">
                     {label}
                   </div>
                 )}
@@ -98,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       {/* Footer */}
       {!isCollapsed && (
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400 text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg font-medium">
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center p-3 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-xl font-medium border border-gray-200 dark:border-gray-700">
             FlowForge Platform v1.0.0
           </div>
         </div>

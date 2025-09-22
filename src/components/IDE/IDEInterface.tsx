@@ -20,10 +20,12 @@ import { SpringBootProject, ProjectFile } from '../../services/springBootGenerat
 import { springBootGenerator } from '../../services/springBootGenerator';
 import MonacoEditor from '@monaco-editor/react';
 import toast from 'react-hot-toast';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function IDEInterface() {
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   
   const [project, setProject] = useState<SpringBootProject | null>(null);
   const [selectedFile, setSelectedFile] = useState<ProjectFile | null>(null);
@@ -87,7 +89,11 @@ export default function IDEInterface() {
         {file.isDirectory ? (
           <div>
             <div
-              className="flex items-center gap-1 py-1 px-1 hover:bg-gray-700 cursor-pointer text-gray-300 text-sm"
+              className={`flex items-center gap-1 py-1 px-1 cursor-pointer text-sm transition-all duration-200 hover:scale-105 ${
+                theme === 'dark'
+                  ? 'hover:bg-gray-700 text-gray-300'
+                  : 'hover:bg-gray-200 text-gray-700'
+              }`}
               onClick={() => toggleFolder(file.path)}
             >
               {expandedFolders.has(file.path) ? (
@@ -95,7 +101,7 @@ export default function IDEInterface() {
               ) : (
                 <ChevronRight size={12} />
               )}
-              <Folder size={12} className="text-blue-400" />
+              <Folder size={12} className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} />
               <span className="text-xs">{file.name}</span>
             </div>
             {expandedFolders.has(file.path) && file.children && (
@@ -107,12 +113,20 @@ export default function IDEInterface() {
         ) : (
           <div
             className={`flex items-center gap-2 py-1 px-2 hover:bg-gray-700 cursor-pointer ${
-              selectedFile?.path === file.path ? 'bg-gray-700' : ''
-            } text-sm`}
+              selectedFile?.path === file.path 
+                ? theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+                : ''
+            } text-sm transition-all duration-200 hover:scale-105 ${
+              theme === 'dark'
+                ? 'hover:bg-gray-700'
+                : 'hover:bg-gray-200'
+            }`}
             onClick={() => setSelectedFile(file)}
           >
             <File size={12} className={getFileIconColor(file.type)} />
-            <span className="text-xs text-gray-300">{file.name}</span>
+            <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              {file.name}
+            </span>
           </div>
         )}
       </div>
@@ -260,40 +274,81 @@ export default function IDEInterface() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className={`min-h-screen flex items-center justify-center transition-colors ${
+        theme === 'dark' ? 'bg-gray-900' : 'bg-white'
+      }`}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading project...</p>
+          <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading project...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-900 text-white flex flex-col overflow-hidden z-50">
+    <div className={`fixed inset-0 flex flex-col overflow-hidden z-50 transition-colors ${
+      theme === 'dark' 
+        ? 'bg-gray-900 text-white' 
+        : 'bg-white text-gray-900'
+    }`}>
       {/* Top Header */}
-      <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
+      <div className={`border-b px-4 py-3 flex items-center justify-between transition-colors ${
+        theme === 'dark'
+          ? 'bg-gray-800 border-gray-700'
+          : 'bg-gray-100 border-gray-200'
+      }`}>
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/kogito/workflows')}
-            className="flex items-center gap-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
+              theme === 'dark'
+                ? 'text-gray-300 hover:text-white hover:bg-gray-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+            }`}
           >
             <ArrowLeft size={16} />
             Back to Workflows
           </button>
           
           <div className="flex items-center gap-3">
-            <Server size={20} className="text-blue-400" />
+            <Server size={20} className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} />
             <div>
-              <h1 className="text-lg font-semibold">{project.projectName}</h1>
-              <p className="text-sm text-gray-400">Spring Boot IDE</p>
+              <h1 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                {project.projectName}
+              </h1>
+              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Spring Boot IDE
+              </p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${
+              theme === 'dark'
+                ? 'text-gray-300 hover:text-white hover:bg-gray-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+            }`}
+            title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {theme === 'light' ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            )}
+          </button>
+
           <div className={`px-3 py-1 rounded-full text-sm ${
-            isServerRunning ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'
+            isServerRunning 
+              ? theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'
+              : theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
           }`}>
             {isServerRunning ? '● Running' : '○ Stopped'}
           </div>
@@ -301,7 +356,7 @@ export default function IDEInterface() {
           {!isServerRunning ? (
             <button
               onClick={handleRunServer}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
             >
               <Play size={16} />
               Run Server
@@ -309,7 +364,7 @@ export default function IDEInterface() {
           ) : (
             <button
               onClick={handleStopServer}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
             >
               <Square size={16} />
               Stop Server
@@ -321,10 +376,18 @@ export default function IDEInterface() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar - File Explorer */}
-        <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col flex-shrink-0">
-          <div className="p-4 border-b border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2">
-              <Code size={16} />
+        <div className={`w-64 border-r flex flex-col flex-shrink-0 transition-colors ${
+          theme === 'dark'
+            ? 'bg-gray-800 border-gray-700'
+            : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className={`p-4 border-b transition-colors ${
+            theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <h3 className={`text-sm font-semibold flex items-center gap-2 ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+            }`}>
+              <Code size={16} className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} />
               Project Explorer
             </h3>
           </div>
@@ -337,13 +400,21 @@ export default function IDEInterface() {
         {/* Center - Code Editor and API Tester */}
         <div className="flex-1 flex flex-col">
           {/* Top Half - Code Editor */}
-          <div className="h-1/2 flex flex-col border-b border-gray-700">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
+          <div className={`h-1/2 flex flex-col border-b transition-colors ${
+            theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <div className={`border-b px-4 py-2 flex items-center justify-between transition-colors ${
+              theme === 'dark'
+                ? 'bg-gray-800 border-gray-700'
+                : 'bg-gray-100 border-gray-200'
+            }`}>
               <div className="flex items-center gap-2">
                 {selectedFile && (
                   <>
-                    <File size={16} className={getFileIconColor(selectedFile.type)} />
-                    <span className="text-sm">{selectedFile.name}</span>
+                    <File size={16} className={`${getFileIconColor(selectedFile.type)} ${theme === 'dark' ? '' : 'opacity-80'}`} />
+                    <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {selectedFile.name}
+                    </span>
                   </>
                 )}
               </div>
@@ -352,7 +423,11 @@ export default function IDEInterface() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => navigator.clipboard.writeText(selectedFile.content)}
-                    className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded"
+                    className={`p-1 rounded transition-all duration-200 hover:scale-110 ${
+                      theme === 'dark'
+                        ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                    }`}
                     title="Copy content"
                   >
                     <Copy size={14} />
@@ -367,7 +442,7 @@ export default function IDEInterface() {
                   height="100%"
                   language={getEditorLanguage(selectedFile.type)}
                   value={selectedFile.content}
-                  theme="vs-dark"
+                  theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
                   options={{
                     readOnly: true,
                     minimap: { enabled: false },
@@ -378,7 +453,9 @@ export default function IDEInterface() {
                   }}
                 />
               ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
+                <div className={`flex items-center justify-center h-full ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`}>
                   <div className="text-center">
                     <File size={48} className="mx-auto mb-4 opacity-50" />
                     <p>Select a file to view its content</p>
@@ -390,25 +467,41 @@ export default function IDEInterface() {
 
           {/* Bottom Half - API Tester (Postman-style) */}
           <div className="h-1/2 flex flex-col">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-              <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2">
-                <Send size={16} />
+            <div className={`border-b px-4 py-2 transition-colors ${
+              theme === 'dark'
+                ? 'bg-gray-800 border-gray-700'
+                : 'bg-gray-100 border-gray-200'
+            }`}>
+              <h3 className={`text-sm font-semibold flex items-center gap-2 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                <Send size={16} className={theme === 'dark' ? 'text-green-400' : 'text-green-600'} />
                 API Tester
               </h3>
             </div>
             
             <div className="flex-1 flex">
               {/* Request Panel */}
-              <div className="flex-1 flex flex-col border-r border-gray-700">
-                <div className="p-4 border-b border-gray-700">
+              <div className={`flex-1 flex flex-col border-r transition-colors ${
+                theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              }`}>
+                <div className={`p-4 border-b transition-colors ${
+                  theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                }`}>
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex-1">
-                      <label className="block text-xs text-gray-400 mb-1">Base URL</label>
+                      <label className={`block text-xs mb-1 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Base URL</label>
                       <input
                         type="text"
                         value={apiBaseUrl}
                         onChange={(e) => setApiBaseUrl(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm transition-all duration-200 ${
+                          theme === 'dark'
+                            ? 'bg-gray-700 border-gray-600 text-white'
+                            : 'bg-white border-gray-300 text-gray-900'
+                        }`}
                         placeholder="http://localhost:8080"
                       />
                     </div>
@@ -420,7 +513,11 @@ export default function IDEInterface() {
                         setSelectedEndpoint(index);
                         setRequestBody(JSON.stringify(project?.endpoints?.[index]?.requestBody || {}, null, 2));
                       }}
-                      className="w-64 px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                      className={`w-64 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm transition-all duration-200 ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      }`}
                     >
                       {(project?.endpoints || []).map((endpoint, index) => (
                         <option key={index} value={index}>
@@ -432,29 +529,31 @@ export default function IDEInterface() {
                     <button
                       onClick={handleTestAPI}
                       disabled={isLoading || !isServerRunning}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
                     >
                       <Send size={16} />
                       {isLoading ? 'Sending...' : 'Send'}
                     </button>
                   </div>
                   
-                  <p className="text-sm text-gray-400">
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     URL: {apiBaseUrl}{project?.endpoints?.[selectedEndpoint]?.path || ''}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
                     {project?.endpoints?.[selectedEndpoint]?.description || 'No description available'}
                   </p>
                 </div>
                 
                 <div className="flex-1 p-4">
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">Request Body</h4>
+                  <h4 className={`text-sm font-medium mb-2 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>Request Body</h4>
                   <MonacoEditor
                     height="100%"
                     language="json"
                     value={requestBody}
                     onChange={(value) => setRequestBody(value || '')}
-                    theme="vs-dark"
+                    theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
                     options={{
                       minimap: { enabled: false },
                       fontSize: 13,
@@ -468,12 +567,20 @@ export default function IDEInterface() {
 
               {/* Response Panel */}
               <div className="flex-1 flex flex-col">
-                <div className="p-4 border-b border-gray-700 flex items-center justify-between">
-                  <h4 className="text-sm font-medium text-gray-300">Response</h4>
+                <div className={`p-4 border-b flex items-center justify-between transition-colors ${
+                  theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                }`}>
+                  <h4 className={`text-sm font-medium ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>Response</h4>
                   {responseData && (
                     <button
                       onClick={copyResponse}
-                      className="flex items-center gap-1 px-2 py-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded text-xs transition-colors"
+                      className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-all duration-200 hover:scale-105 ${
+                        theme === 'dark'
+                          ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                      }`}
                     >
                       <Copy size={12} />
                       Copy
@@ -487,7 +594,7 @@ export default function IDEInterface() {
                       height="100%"
                       language="json"
                       value={responseData}
-                      theme="vs-dark"
+                      theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
                       options={{
                         readOnly: true,
                         minimap: { enabled: false },
@@ -498,7 +605,9 @@ export default function IDEInterface() {
                       }}
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500">
+                    <div className={`flex items-center justify-center h-full ${
+                      theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                    }`}>
                       <div className="text-center">
                         <Send size={32} className="mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Send a request to see the response</p>
@@ -513,16 +622,30 @@ export default function IDEInterface() {
       </div>
 
       {/* Bottom Terminal */}
-      <div className="h-48 bg-black border-t border-gray-700 flex flex-col flex-shrink-0">
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2">
-            <Terminal size={16} />
+      <div className={`h-48 border-t flex flex-col flex-shrink-0 transition-colors ${
+        theme === 'dark'
+          ? 'bg-black border-gray-700'
+          : 'bg-gray-50 border-gray-200'
+      }`}>
+        <div className={`border-b px-4 py-2 flex items-center justify-between transition-colors ${
+          theme === 'dark'
+            ? 'bg-gray-800 border-gray-700'
+            : 'bg-gray-100 border-gray-200'
+        }`}>
+          <h3 className={`text-sm font-semibold flex items-center gap-2 ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+          }`}>
+            <Terminal size={16} className={theme === 'dark' ? 'text-green-400' : 'text-green-600'} />
             Server Terminal
           </h3>
           
           <button
             onClick={() => setTerminalOutput([])}
-            className="text-xs text-gray-400 hover:text-white px-2 py-1 hover:bg-gray-700 rounded transition-colors"
+            className={`text-xs px-2 py-1 rounded transition-all duration-200 hover:scale-105 ${
+              theme === 'dark'
+                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+            }`}
           >
             Clear
           </button>
@@ -530,13 +653,15 @@ export default function IDEInterface() {
         
         <div className="flex-1 p-4 overflow-y-auto font-mono text-sm">
           {terminalOutput.map((line, index) => (
-            <div key={index} className="text-green-400 text-xs leading-relaxed">
+            <div key={index} className={`text-xs leading-relaxed ${
+              theme === 'dark' ? 'text-green-400' : 'text-green-600'
+            }`}>
               {line}
             </div>
           ))}
           
           {terminalOutput.length === 0 && (
-            <div className="text-gray-500 text-xs">
+            <div className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
               Terminal output will appear here when you run the server...
             </div>
           )}

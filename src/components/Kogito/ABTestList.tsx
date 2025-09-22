@@ -173,7 +173,7 @@ export default function ABTestList() {
 
       {/* A/B Tests Grid */}
       {filteredABTests.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-16">
           <BarChart3 size={48} className="mx-auto mb-4 text-text-muted opacity-50" />
           <h3 className="text-lg font-medium text-text-primary mb-2">No A/B tests found</h3>
           <p className="text-text-muted mb-4">
@@ -192,19 +192,19 @@ export default function ABTestList() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
           {filteredABTests.map((test) => (
             <div
               key={test.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-wells transition-shadow"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-text-primary mb-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                     {test.name}
                   </h3>
-                  <p className="text-sm text-text-muted line-clamp-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                     {test.description}
                   </p>
                 </div>
@@ -219,16 +219,16 @@ export default function ABTestList() {
 
               {/* Metrics Overview */}
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-surface p-3 rounded-lg">
-                  <div className="text-sm text-text-muted mb-1">Total Executions</div>
-                  <div className="text-xl font-bold text-text-primary">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Executions</div>
+                  <div className="text-xl font-bold text-gray-900 dark:text-white">
                     {test.metrics.totalExecutions.toLocaleString()}
                   </div>
                 </div>
                 
-                <div className="bg-surface p-3 rounded-lg">
-                  <div className="text-sm text-text-muted mb-1">Traffic Split</div>
-                  <div className="text-xl font-bold text-text-primary">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Traffic Split</div>
+                  <div className="text-xl font-bold text-gray-900 dark:text-white">
                     {test.trafficSplit}% / {100 - test.trafficSplit}%
                   </div>
                 </div>
@@ -319,7 +319,7 @@ export default function ABTestList() {
                 {test.status === 'draft' && (
                   <button
                     onClick={() => handleStartTest(test)}
-                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-success text-white hover:bg-green-600 rounded-md transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-success text-white hover:bg-green-600 rounded-md transition-all duration-200 hover:scale-105"
                   >
                     <Play size={14} />
                     Start
@@ -330,7 +330,7 @@ export default function ABTestList() {
                   <>
                     <button
                       onClick={() => handlePauseTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-warning text-white hover:bg-yellow-600 rounded-md transition-colors"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-warning text-white hover:bg-yellow-600 rounded-md transition-all duration-200 hover:scale-105"
                     >
                       <Pause size={14} />
                       Pause
@@ -338,7 +338,7 @@ export default function ABTestList() {
                     
                     <button
                       onClick={() => handleCompleteTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-primary text-white hover:bg-primary-600 rounded-md transition-colors"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-primary text-white hover:bg-primary-600 rounded-md transition-all duration-200 hover:scale-105"
                     >
                       <CheckCircle size={14} />
                       Complete
@@ -350,7 +350,7 @@ export default function ABTestList() {
                   <>
                     <button
                       onClick={() => handleStartTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-success text-white hover:bg-green-600 rounded-md transition-colors"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-success text-white hover:bg-green-600 rounded-md transition-all duration-200 hover:scale-105"
                     >
                       <Play size={14} />
                       Resume
@@ -358,7 +358,7 @@ export default function ABTestList() {
                     
                     <button
                       onClick={() => handleCompleteTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-primary text-white hover:bg-primary-600 rounded-md transition-colors"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-primary text-white hover:bg-primary-600 rounded-md transition-all duration-200 hover:scale-105"
                     >
                       <CheckCircle size={14} />
                       Complete
@@ -368,7 +368,7 @@ export default function ABTestList() {
 
                 <button
                   onClick={() => setCurrentABTest(test)}
-                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-text-primary hover:bg-gray-100 rounded-md transition-colors ml-auto"
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200 hover:scale-105 ml-auto"
                 >
                   <BarChart3 size={14} />
                   View Details

@@ -478,7 +478,7 @@ export default function ServiceEditor() {
                       />
                       <button
                         onClick={() => removeQueryParam(index)}
-                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 focus-wells"
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -525,7 +525,7 @@ export default function ServiceEditor() {
                       />
                       <button
                         onClick={() => removeHeader(index)}
-                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                       >
                         <Trash2 size={14} />
                       </button>

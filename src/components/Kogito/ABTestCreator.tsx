@@ -113,15 +113,15 @@ export default function ABTestCreator() {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-wells-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-700">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-t-xl">
           <div>
-            <h2 className="text-xl font-bold text-text-primary">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               {currentABTest ? 'Edit A/B Test' : 'Create A/B Test'}
             </h2>
-            <p className="text-text-muted">
+            <p className="text-gray-600 dark:text-gray-400">
               Compare two workflow variants to optimize performance
             </p>
           </div>
@@ -130,7 +130,7 @@ export default function ABTestCreator() {
             <button
               onClick={handleSave}
               disabled={!canProceedToNextTab()}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-md transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg shadow-lg transition-all duration-200 hover:scale-105"
             >
               <Save size={16} />
               Save
@@ -138,7 +138,7 @@ export default function ABTestCreator() {
 
             <button
               onClick={handleClose}
-              className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-110"
             >
               <X size={20} />
             </button>
@@ -146,13 +146,13 @@ export default function ABTestCreator() {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200">
+        <div className="flex border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <button
             onClick={() => setActiveTab('setup')}
             className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors ${
               activeTab === 'setup'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-text-muted hover:text-text-primary'
+                ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <Settings size={16} />
@@ -164,8 +164,8 @@ export default function ABTestCreator() {
             disabled={!canProceedToNextTab() && activeTab === 'setup'}
             className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
               activeTab === 'criteria'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-text-muted hover:text-text-primary'
+                ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <Target size={16} />
@@ -177,8 +177,8 @@ export default function ABTestCreator() {
             disabled={!canProceedToNextTab()}
             className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
               activeTab === 'review'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-text-muted hover:text-text-primary'
+                ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <BarChart3 size={16} />
@@ -187,31 +187,31 @@ export default function ABTestCreator() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
           {activeTab === 'setup' && (
             <div className="max-w-2xl space-y-6">
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
                   Test Name *
                 </label>
                 <input
                   type="text"
                   value={testData.name || ''}
                   onChange={(e) => setTestData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter A/B test name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
                   Description
                 </label>
                 <textarea
                   value={testData.description || ''}
                   onChange={(e) => setTestData(prev => ({ ...prev, description: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   placeholder="Describe what you're testing and why"
                 />
               </div>

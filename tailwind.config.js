@@ -12,11 +12,35 @@ export default {
           200: '#fecaca',
           300: '#fca5a5',
           400: '#f87171',
-          500: '#d92d20', // Wells Fargo Red
+          500: '#3b82f6', // Changed to blue for better UI
           600: '#c53030',
           700: '#b91c1c',
           800: '#991b1b',
           900: '#7f1d1d',
+        },
+        blue: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+        },
+        purple: {
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc',
+          500: '#a855f7',
+          600: '#9333ea',
+          700: '#7c3aed',
+          800: '#6b21a8',
+          900: '#581c87',
         },
         secondary: {
           50: '#fffbeb',
@@ -57,6 +81,9 @@ export default {
         success: '#10b981',
         warning: '#f59e0b',
         error: '#ef4444',
+        // Enhanced colors for better UI
+        'primary-500': '#3b82f6',
+        'primary-600': '#2563eb',
         // Text colors for dark theme
         'text-primary': '#f9fafb',
         'text-secondary': '#d1d5db',
@@ -69,12 +96,22 @@ export default {
         'wells': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
         'wells-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'wells-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
+        'glow-lg': '0 0 30px rgba(59, 130, 246, 0.4)',
       },
       borderRadius: {
-        'wells': '0.5rem',
+        'wells': '0.75rem',
       },
       fontFamily: {
         'wells': ['Inter', 'system-ui', 'sans-serif'],
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      backdropBlur: {
+        'xs': '2px',
       },
     },
   },

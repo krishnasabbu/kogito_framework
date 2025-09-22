@@ -227,14 +227,14 @@ export default function WorkflowEditor() {
           {/* Initial Request JSON Button */}
           <button
             onClick={() => setShowInitialRequestEditor(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-wells-red text-white hover:bg-red-700 rounded-lg transition-all duration-200 shadow-lg"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 rounded-lg transition-all duration-200 shadow-lg hover:scale-105"
           >
             <Upload size={16} />
             {workflowData.initialRequestConfig ? 'Edit Initial JSON' : 'Set Initial JSON'}
           </button>
           
           {workflowData.initialRequestConfig && (
-            <div className="text-xs text-green-400 bg-green-900/20 px-3 py-1 rounded-full border border-green-800">
+            <div className="text-xs text-green-400 bg-green-900/20 px-3 py-1 rounded-full border border-green-800 animate-pulse">
               ✓ {workflowData.initialRequestConfig.name}
             </div>
           )}
@@ -265,7 +265,7 @@ export default function WorkflowEditor() {
           {/* Action Buttons */}
           <button
             onClick={() => setShowPropertiesPanel(!showPropertiesPanel)}
-            className="flex items-center gap-2 px-4 py-2 bg-dark-surface text-dark-text-primary hover:bg-dark-hover border border-dark-border rounded-lg transition-all duration-200"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600 rounded-lg transition-all duration-200 hover:scale-105"
           >
             <Settings size={16} />
             Properties
@@ -274,7 +274,7 @@ export default function WorkflowEditor() {
           <button
             onClick={handleExecute}
             disabled={!currentWorkflow}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-all duration-200"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
           >
             <Play size={16} />
             Execute
@@ -282,7 +282,7 @@ export default function WorkflowEditor() {
 
           <button
             onClick={handleSave}
-            className="flex items-center gap-2 px-4 py-2 bg-wells-red text-white hover:bg-red-700 rounded-lg transition-all duration-200"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
           >
             <Save size={16} />
             Save
@@ -290,7 +290,7 @@ export default function WorkflowEditor() {
 
           <button
             onClick={handleClose}
-            className="p-2 text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-hover rounded-lg transition-all duration-200"
+            className="p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-110"
           >
             <X size={20} />
           </button>
