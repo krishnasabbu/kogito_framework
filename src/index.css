@@ -90,7 +90,7 @@ body {
 }
 
 .table-header {
-  @apply bg-gradient-to-r from-bolt-surfaceAlt to-bolt-alt border-b border-bolt-divider;
+  @apply bg-gradient-to-r from-bolt-surfaceAlt to-bolt-dark-alt border-b border-bolt-divider;
 }
 
 .table-row {

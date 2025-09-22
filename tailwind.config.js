@@ -8,7 +8,7 @@ export default {
         // Wells Fargo Bolt Theme
         bolt: {
           // Flat keys for gradient utilities
-          'alt': '#1E1E1E',
+          'dark-alt': '#1E1E1E',
           'surface': '#1A1A1A',
           'surfaceAlt': '#2A2A2A',
           'divider': '#2A2A2A',
