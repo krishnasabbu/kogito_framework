@@ -12,7 +12,7 @@ import {
   Calendar,
   User,
   Tag,
-  Activity
+  Activity,
   Grid,
   List
 } from 'lucide-react';

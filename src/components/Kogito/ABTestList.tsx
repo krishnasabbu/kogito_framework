@@ -218,31 +218,7 @@ export default function ABTestList() {
           )}
         </div>
       ) : (
-        
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setViewMode('card')}
-            className={`p-2 rounded-lg transition-all duration-200 ${
-              viewMode === 'card'
-                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-            }`}
-          >
-            <Grid size={20} />
-          </button>
-          <button
-            onClick={() => setViewMode('table')}
-            className={`p-2 rounded-lg transition-all duration-200 ${
-              viewMode === 'table'
-                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-            }`}
-          >
-            <List size={20} />
-          </button>
-        </div>
-        <>
-          {viewMode === 'card' ? (
+        viewMode === 'card' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
               {filteredABTests.map((test) => (
                 <div
@@ -478,7 +454,6 @@ export default function ABTestList() {
               </div>
             </div>
           )}
-        </>
       )}
     </div>
   );
