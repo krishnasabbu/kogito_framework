@@ -9,7 +9,9 @@ import {
   Calendar,
   Users,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Grid,
+  List
 } from 'lucide-react';
 import { useKogitoStore } from '../../stores/kogitoStore';
 import { ABTest } from '../../types/kogito';
@@ -30,6 +32,7 @@ export default function ABTestList() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
   useEffect(() => {
     loadABTests();
@@ -146,7 +149,7 @@ export default function ABTestList() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4 p-4 bg-surface rounded-lg">
+      <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="flex-1 relative">
           <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted" />
           <input
@@ -169,6 +172,29 @@ export default function ABTestList() {
           <option value="paused">Paused</option>
           <option value="completed">Completed</option>
         </select>
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode('card')}
+            className={`p-2 rounded-lg transition-all duration-200 ${
+              viewMode === 'card'
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            <Grid size={20} />
+          </button>
+          <button
+            onClick={() => setViewMode('table')}
+            className={`p-2 rounded-lg transition-all duration-200 ${
+              viewMode === 'table'
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            <List size={20} />
+          </button>
+        </div>
       </div>
 
       {/* A/B Tests Grid */}
@@ -192,191 +218,267 @@ export default function ABTestList() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-          {filteredABTests.map((test) => (
-            <div
-              key={test.id}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                    {test.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                    {test.description}
-                  </p>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <span className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(test.status)}`}>
-                    {getStatusIcon(test.status)}
-                    {test.status.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Metrics Overview */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Executions</div>
-                  <div className="text-xl font-bold text-gray-900 dark:text-white">
-                    {test.metrics.totalExecutions.toLocaleString()}
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Traffic Split</div>
-                  <div className="text-xl font-bold text-gray-900 dark:text-white">
-                    {test.trafficSplit}% / {100 - test.trafficSplit}%
-                  </div>
-                </div>
-              </div>
-
-              {/* A/B Comparison */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="border border-blue-200 bg-blue-50 p-3 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-blue-800">Variant A</span>
-                    {test.status === 'completed' && calculateWinner(test) === 'A' && (
-                      <TrendingUp size={14} className="text-success" />
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-blue-600">
-                      Success Rate: {(test.metrics.groupASuccessRate * 100).toFixed(1)}%
-                    </div>
-                    <div className="text-xs text-blue-600">
-                      Avg Duration: {test.metrics.groupAAvgDuration}ms
-                    </div>
-                    <div className="text-xs text-blue-600">
-                      Executions: {test.metrics.groupAExecutions}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border border-green-200 bg-green-50 p-3 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-green-800">Variant B</span>
-                    {test.status === 'completed' && calculateWinner(test) === 'B' && (
-                      <TrendingUp size={14} className="text-success" />
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-green-600">
-                      Success Rate: {(test.metrics.groupBSuccessRate * 100).toFixed(1)}%
-                    </div>
-                    <div className="text-xs text-green-600">
-                      Avg Duration: {test.metrics.groupBAvgDuration}ms
-                    </div>
-                    <div className="text-xs text-green-600">
-                      Executions: {test.metrics.groupBExecutions}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Statistical Significance */}
-              {test.status === 'running' || test.status === 'completed' ? (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-text-primary">
-                      Statistical Significance
-                    </span>
-                    <span className={`text-sm font-medium ${
-                      test.metrics.statisticalSignificance >= 0.95 ? 'text-success' : 'text-warning'
-                    }`}>
-                      {(test.metrics.statisticalSignificance * 100).toFixed(1)}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div
-                      className={`h-2 rounded-full ${
-                        test.metrics.statisticalSignificance >= 0.95 ? 'bg-success' : 'bg-warning'
-                      }`}
-                      style={{ width: `${test.metrics.statisticalSignificance * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ) : null}
-
-              {/* Metadata */}
-              <div className="space-y-2 mb-4 text-sm text-text-muted">
-                <div className="flex items-center gap-2">
-                  <Calendar size={14} />
-                  <span>Started {format(new Date(test.startDate), 'MMM d, yyyy')}</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Users size={14} />
-                  <span>Created by {test.createdBy}</span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2">
-                {test.status === 'draft' && (
-                  <button
-                    onClick={() => handleStartTest(test)}
-                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-success text-white hover:bg-green-600 rounded-md transition-all duration-200 hover:scale-105"
-                  >
-                    <Play size={14} />
-                    Start
-                  </button>
-                )}
-                
-                {test.status === 'running' && (
-                  <>
-                    <button
-                      onClick={() => handlePauseTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-warning text-white hover:bg-yellow-600 rounded-md transition-all duration-200 hover:scale-105"
-                    >
-                      <Pause size={14} />
-                      Pause
-                    </button>
-                    
-                    <button
-                      onClick={() => handleCompleteTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-primary text-white hover:bg-primary-600 rounded-md transition-all duration-200 hover:scale-105"
-                    >
-                      <CheckCircle size={14} />
-                      Complete
-                    </button>
-                  </>
-                )}
-                
-                {test.status === 'paused' && (
-                  <>
-                    <button
-                      onClick={() => handleStartTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-success text-white hover:bg-green-600 rounded-md transition-all duration-200 hover:scale-105"
-                    >
-                      <Play size={14} />
-                      Resume
-                    </button>
-                    
-                    <button
-                      onClick={() => handleCompleteTest(test)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-primary text-white hover:bg-primary-600 rounded-md transition-all duration-200 hover:scale-105"
-                    >
-                      <CheckCircle size={14} />
-                      Complete
-                    </button>
-                  </>
-                )}
-
-                <button
-                  onClick={() => setCurrentABTest(test)}
-                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200 hover:scale-105 ml-auto"
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode('card')}
+            className={`p-2 rounded-lg transition-all duration-200 ${
+              viewMode === 'card'
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            <Grid size={20} />
+          </button>
+          <button
+            onClick={() => setViewMode('table')}
+            className={`p-2 rounded-lg transition-all duration-200 ${
+              viewMode === 'table'
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            <List size={20} />
+          </button>
+        </div>
+        <>
+          {viewMode === 'card' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+              {filteredABTests.map((test) => (
+                <div
+                  key={test.id}
+                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg hover:scale-105 transition-all duration-300 flex flex-col h-80"
                 >
-                  <BarChart3 size={14} />
-                  View Details
-                </button>
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                        {test.name}
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                        {test.description}
+                      </p>
+                    </div>
+                    
+                    <span className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(test.status)}`}>
+                      {getStatusIcon(test.status)}
+                      {test.status.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Metrics Overview */}
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Total Executions</div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">
+                        {test.metrics.totalExecutions.toLocaleString()}
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Traffic Split</div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">
+                        {test.trafficSplit}% / {100 - test.trafficSplit}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* A/B Comparison */}
+                  <div className="grid grid-cols-2 gap-2 mb-3 flex-1">
+                    <div className="border border-blue-200 bg-blue-50 p-2 rounded-lg">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-blue-800">Variant A</span>
+                        {test.status === 'completed' && calculateWinner(test) === 'A' && (
+                          <TrendingUp size={12} className="text-success" />
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-xs text-blue-600">
+                          Success: {(test.metrics.groupASuccessRate * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          Duration: {test.metrics.groupAAvgDuration}ms
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border border-green-200 bg-green-50 p-2 rounded-lg">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-green-800">Variant B</span>
+                        {test.status === 'completed' && calculateWinner(test) === 'B' && (
+                          <TrendingUp size={12} className="text-success" />
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-xs text-green-600">
+                          Success: {(test.metrics.groupBSuccessRate * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-xs text-green-600">
+                          Duration: {test.metrics.groupBAvgDuration}ms
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Metadata */}
+                  <div className="space-y-1 mb-3 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-1">
+                      <Calendar size={10} />
+                      <span>Started {format(new Date(test.startDate), 'MMM d')}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
+                      <Users size={10} />
+                      <span className="truncate">{test.createdBy}</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 mt-auto">
+                    {test.status === 'draft' && (
+                      <button
+                        onClick={() => handleStartTest(test)}
+                        className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-success text-white hover:bg-green-600 rounded transition-all duration-200"
+                      >
+                        <Play size={10} />
+                        Start
+                      </button>
+                    )}
+                    
+                    {test.status === 'running' && (
+                      <button
+                        onClick={() => handlePauseTest(test)}
+                        className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-warning text-white hover:bg-yellow-600 rounded transition-all duration-200"
+                      >
+                        <Pause size={10} />
+                        Pause
+                      </button>
+                    )}
+                    
+                    <button
+                      onClick={() => setCurrentABTest(test)}
+                      className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all duration-200 ml-auto"
+                    >
+                      <BarChart3 size={10} />
+                      Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-lg">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                    <tr>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Name
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Status
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Traffic Split
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Total Executions
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Success Rate A/B
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Created By
+                      </th>
+                      <th className="text-left px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                    {filteredABTests.map((test) => (
+                      <tr key={test.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {test.name}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                              {test.description}
+                            </div>
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <span className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(test.status)}`}>
+                            {getStatusIcon(test.status)}
+                            {test.status.toUpperCase()}
+                          </span>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {test.trafficSplit}% / {100 - test.trafficSplit}%
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {test.metrics.totalExecutions.toLocaleString()}
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {(test.metrics.groupASuccessRate * 100).toFixed(1)}% / {(test.metrics.groupBSuccessRate * 100).toFixed(1)}%
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {test.createdBy}
+                          </div>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            {test.status === 'draft' && (
+                              <button
+                                onClick={() => handleStartTest(test)}
+                                className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-200"
+                                title="Start"
+                              >
+                                <Play size={14} />
+                              </button>
+                            )}
+                            
+                            {test.status === 'running' && (
+                              <button
+                                onClick={() => handlePauseTest(test)}
+                                className="p-2 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-all duration-200"
+                                title="Pause"
+                              >
+                                <Pause size={14} />
+                              </button>
+                            )}
+                            
+                            <button
+                              onClick={() => setCurrentABTest(test)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200"
+                              title="View Details"
+                            >
+                              <BarChart3 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );
