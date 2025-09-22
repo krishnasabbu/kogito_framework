@@ -5,13 +5,17 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Flat keys for gradient utilities
+        'bolt-alt': '#1E1E1E',
+        'bolt-surface': '#1A1A1A',
+        'bolt-surfaceAlt': '#2A2A2A',
+        'bolt-divider': '#2A2A2A',
+        'bolt-hover': 'rgba(255,255,255,0.08)',
+        'bolt-active': 'rgba(255,255,255,0.16)',
         // Wells Fargo Bolt Theme
         bolt: {
           // Background Colors
           'bg-primary': '#121212',
-          'bg-alt': '#1E1E1E',
-          'bg-surface': '#1A1A1A',
-          'bg-surface-alt': '#2A2A2A',
           
           // Text Colors
           'text-primary': '#FFFFFF',
@@ -25,9 +29,6 @@ export default {
           'accent-gold': '#FFD700',
           
           // Borders/States
-          'divider': '#2A2A2A',
-          'hover': 'rgba(255,255,255,0.08)',
-          'active': 'rgba(255,255,255,0.16)',
         },
         // Wells Fargo Brand Colors
         primary: {
