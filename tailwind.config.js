@@ -102,6 +102,7 @@ export default {
         'wells-red': '#d92d20',
         'wells-gold': '#f59e0b',
         // Success, Warning, Error
+      }
       width: {
         'card': '28rem',
       },
