@@ -108,8 +108,8 @@ export default function ServicesDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-bolt-text-primary">Services</h2>
-          <p className="text-bolt-text-secondary">Manage and test your API services</p>
+          <h2 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary">Services</h2>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">Manage and test your API services</p>
         </div>
         
         <button
@@ -124,13 +124,13 @@ export default function ServicesDashboard() {
       {/* Search and View Controls */}
       <div className="card flex items-center gap-4 p-6">
         <div className="flex-1 relative">
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bolt-text-secondary" />
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-secondary dark:text-dark-text-secondary" />
           <input
             type="text"
             placeholder="Search services..."
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-bolt-surfaceAlt border border-bolt-divider text-bolt-text-default rounded-lg focus:ring-2 focus:ring-bolt-accent-red focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-3 bg-light-surface dark:bg-dark-surface-alt border border-light-border dark:border-dark-border text-light-text-primary dark:text-dark-text-default rounded-lg focus:ring-2 focus:ring-wells-red focus:border-transparent transition-all duration-200"
           />
         </div>
         
@@ -139,8 +139,8 @@ export default function ServicesDashboard() {
             onClick={() => setViewMode('card')}
             className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'card'
-                ? 'bg-bolt-accent-red text-white shadow-bolt'
-                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
+                ? 'bg-wells-red text-white shadow-card'
+                : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary hover:bg-light-hover dark:hover:bg-dark-hover'
             }`}
           >
             <Grid size={20} />
@@ -149,8 +149,8 @@ export default function ServicesDashboard() {
             onClick={() => setViewMode('table')}
             className={`p-3 rounded-lg transition-all duration-200 ${
               viewMode === 'table'
-                ? 'bg-bolt-accent-red text-white shadow-bolt'
-                : 'text-bolt-text-secondary hover:text-bolt-text-primary hover:bg-bolt-hover'
+                ? 'bg-wells-red text-white shadow-card'
+                : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary hover:bg-light-hover dark:hover:bg-dark-hover'
             }`}
           >
             <List size={20} />
@@ -161,11 +161,11 @@ export default function ServicesDashboard() {
       {/* Services Display */}
       {services.length === 0 ? (
         <div className="text-center py-16">
-          <div className="w-16 h-16 bg-bolt-bg-surface-alt rounded-full flex items-center justify-center mx-auto mb-4">
-            <Plus size={32} className="text-bolt-text-disabled" />
+          <div className="w-16 h-16 bg-light-surface dark:bg-dark-surface-alt rounded-full flex items-center justify-center mx-auto mb-4">
+            <Plus size={32} className="text-light-text-secondary dark:text-dark-text-secondary" />
           </div>
-          <h3 className="text-xl font-medium text-bolt-text-primary mb-2">No services found</h3>
-          <p className="text-bolt-text-secondary mb-6">
+          <h3 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-2">No services found</h3>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
             {searchTerm ? 'Try adjusting your search terms' : 'Create your first service to get started'}
           </p>
           {!searchTerm && (
@@ -189,10 +189,10 @@ export default function ServicesDashboard() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-bolt-text-primary mb-2 truncate">
+                      <h3 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2 truncate">
                         {service.name}
                       </h3>
-                      <p className="text-sm text-bolt-text-secondary line-clamp-2">
+                      <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary line-clamp-2">
                         {service.description}
                       </p>
                     </div>
@@ -204,7 +204,7 @@ export default function ServicesDashboard() {
 
                   {/* URL */}
                   <div className="mb-4">
-                    <p className="text-sm text-bolt-text-secondary truncate font-mono">
+                    <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary truncate font-mono">
                       {service.url}
                     </p>
                   </div>
@@ -216,14 +216,14 @@ export default function ServicesDashboard() {
                         {service.response.status >= 200 && service.response.status < 300 ? (
                           <CheckCircle size={14} className="text-green-400" />
                         ) : (
-                          <XCircle size={14} className="text-bolt-accent-red" />
+                          <XCircle size={14} className="text-wells-red" />
                         )}
                         <span className={getStatusColor(service.response.status)}>
                           {service.response.status} {service.response.statusText}
                         </span>
                       </div>
                       
-                      <div className="flex items-center gap-1 text-bolt-text-secondary">
+                      <div className="flex items-center gap-1 text-light-text-secondary dark:text-dark-text-secondary">
                         <Clock size={14} />
                         <span>{service.response.responseTime}ms</span>
                       </div>
@@ -236,13 +236,13 @@ export default function ServicesDashboard() {
                       {service.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-1 text-xs bg-bolt-surfaceAlt text-bolt-text-secondary rounded-full border border-bolt-divider"
+                          className="px-2 py-1 text-xs bg-light-surface dark:bg-dark-surface-alt text-light-text-secondary dark:text-dark-text-secondary rounded-full border border-light-border dark:border-dark-border"
                         >
                           {tag}
                         </span>
                       ))}
                       {service.tags.length > 3 && (
-                        <span className="px-2 py-1 text-xs bg-bolt-surfaceAlt text-bolt-text-secondary rounded-full border border-bolt-divider">
+                        <span className="px-2 py-1 text-xs bg-light-surface dark:bg-dark-surface-alt text-light-text-secondary dark:text-dark-text-secondary rounded-full border border-light-border dark:border-dark-border">
                           +{service.tags.length - 3}
                         </span>
                       )}
@@ -250,7 +250,7 @@ export default function ServicesDashboard() {
                   )}
 
                   {/* Metadata */}
-                  <div className="text-xs text-bolt-text-secondary mb-4 flex-1">
+                  <div className="text-xs text-light-text-secondary dark:text-dark-text-secondary mb-4 flex-1">
                     <div className="flex items-center gap-1">
                       <Calendar size={12} />
                       <span>Updated {format(new Date(service.updatedAt), 'MMM d, yyyy')}</span>
@@ -269,7 +269,7 @@ export default function ServicesDashboard() {
                     
                     <button
                       onClick={() => handleEditService(service)}
-                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-bolt-text-secondary hover:bg-bolt-hover rounded-lg transition-all duration-200 hover:scale-105"
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover dark:hover:bg-dark-hover rounded-lg transition-all duration-200 hover:scale-105"
                     >
                       <Edit size={14} />
                       Edit
@@ -277,7 +277,7 @@ export default function ServicesDashboard() {
                     
                     <button
                       onClick={() => handleDeleteService(service)}
-                      className="p-2 text-bolt-text-secondary hover:text-bolt-accent-red hover:bg-bolt-accent-red/20 rounded-lg transition-all duration-200 hover:scale-110"
+                      className="p-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-wells-red hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                       title="Delete"
                     >
                       <Trash2 size={14} />
@@ -292,35 +292,35 @@ export default function ServicesDashboard() {
                 <table className="w-full">
                   <thead className="table-header">
                     <tr>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Name
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Method
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         URL
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Status
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Updated
                       </th>
-                      <th className="text-left px-6 py-4 text-sm font-medium text-bolt-text-primary">
+                      <th className="text-left px-6 py-4 text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-bolt-divider">
+                  <tbody className="divide-y divide-light-border dark:divide-dark-border">
                     {services.map((service) => (
                       <tr key={service.id} className="table-row">
                         <td className="px-6 py-4">
                           <div>
-                            <div className="text-sm font-medium text-bolt-text-primary">
+                            <div className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                               {service.name}
                             </div>
-                            <div className="text-sm text-bolt-text-secondary truncate max-w-xs">
+                            <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary truncate max-w-xs">
                               {service.description}
                             </div>
                           </div>
@@ -333,7 +333,7 @@ export default function ServicesDashboard() {
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-primary font-mono truncate max-w-xs">
+                          <div className="text-sm text-light-text-primary dark:text-dark-text-primary font-mono truncate max-w-xs">
                             {service.url}
                           </div>
                         </td>
@@ -344,19 +344,19 @@ export default function ServicesDashboard() {
                               {service.response.status >= 200 && service.response.status < 300 ? (
                                 <CheckCircle size={14} className="text-green-400" />
                               ) : (
-                                <XCircle size={14} className="text-bolt-accent-red" />
+                                <XCircle size={14} className="text-wells-red" />
                               )}
                               <span className={`text-sm ${getStatusColor(service.response.status)}`}>
                                 {service.response.status}
                               </span>
                             </div>
                           ) : (
-                            <span className="text-sm text-bolt-text-disabled">Not tested</span>
+                            <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary opacity-50">Not tested</span>
                           )}
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-bolt-text-secondary">
+                          <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                             {format(new Date(service.updatedAt), 'MMM d, yyyy')}
                           </div>
                         </td>
@@ -381,7 +381,7 @@ export default function ServicesDashboard() {
                             
                             <button
                               onClick={() => handleDeleteService(service)}
-                              className="p-2 text-bolt-accent-red hover:bg-bolt-accent-red/20 rounded-lg transition-all duration-200 hover:scale-110"
+                              className="p-2 text-wells-red hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                               title="Delete"
                             >
                               <Trash2 size={16} />
@@ -399,7 +399,7 @@ export default function ServicesDashboard() {
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div className="card flex items-center justify-between mt-6 p-4">
-              <div className="text-sm text-bolt-text-secondary">
+              <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                 Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} services
               </div>
               
@@ -407,7 +407,7 @@ export default function ServicesDashboard() {
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page === 1}
-                 className="p-2 text-bolt-text-secondary hover:text-bolt-text-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
+                 className="p-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -418,8 +418,8 @@ export default function ServicesDashboard() {
                     onClick={() => handlePageChange(page)}
                     className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 hover:scale-105 ${
                       page === pagination.page
-                        ? 'bg-bolt-accent-red text-white shadow-bolt'
-                        : 'text-bolt-text-secondary hover:bg-bolt-hover'
+                        ? 'bg-wells-red text-white shadow-card'
+                        : 'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover dark:hover:bg-dark-hover'
                     }`}
                   >
                     {page}
@@ -429,7 +429,7 @@ export default function ServicesDashboard() {
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page === pagination.totalPages}
-                 className="p-2 text-bolt-text-secondary hover:text-bolt-text-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
+                 className="p-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 hover:scale-110"
                 >
                   <ChevronRight size={20} />
                 </button>

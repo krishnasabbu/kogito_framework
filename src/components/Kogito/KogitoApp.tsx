@@ -13,7 +13,7 @@ export default function KogitoApp() {
   const { showABTestCreator } = useKogitoStore();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900 transition-colors">
+    <div className="min-h-screen bg-light-bg dark:bg-dark-bg transition-colors">
       <KogitoNavigation />
       
       <main className="container mx-auto px-6 py-8 max-w-7xl min-h-screen">
