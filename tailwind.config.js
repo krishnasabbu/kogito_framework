@@ -105,22 +105,11 @@ export default {
       width: {
         'card': '28rem',
       },
+      width: {
+        'card': '28rem',
+      },
       borderRadius: {
         'card': '1.25rem',
-      },
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444',
-        // Enhanced colors for better UI
-        'primary-500': '#3b82f6',
-        'primary-600': '#2563eb',
-        // Text colors for dark theme
-        'text-primary': '#f9fafb',
-        'text-secondary': '#d1d5db',
-        'text-muted': '#9ca3af',
-        // Surface colors
-        surface: '#f8fafc',
-        'surface-dark': '#1e293b',
       },
       boxShadow: {
         'wells': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
