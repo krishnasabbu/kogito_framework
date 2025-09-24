@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, Clock, Filter, Search, Eye, ChevronDown, ChevronRight } from 'lucide-react';
 import { ExecutionLog } from '../../types/abtest';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
