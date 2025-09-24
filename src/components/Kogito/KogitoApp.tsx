@@ -17,9 +17,9 @@ export default function KogitoApp() {
 
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg transition-colors">
-      <KogitoNavigation />
+      {/* <KogitoNavigation /> */}
       
-      <main className="container mx-auto px-6 py-8 max-w-7xl min-h-screen">
+      <main className="container mx-auto px-6 py-8 min-h-screen">
         <Routes>
           <Route path="/" element={<Navigate to="workflows" replace />} />
           <Route path="workflows" element={<WorkflowList />} />

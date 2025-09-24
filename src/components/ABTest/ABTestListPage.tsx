@@ -38,8 +38,8 @@ export default function ABTestListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-light-bg dark:bg-dark-bg">
+      <div className="mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

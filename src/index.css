@@ -168,3 +168,18 @@ body {
 .focus-wells {
   @apply focus:outline-none focus:ring-2 focus:ring-wells-red focus:ring-offset-2 dark:focus:ring-offset-gray-800;
 }
+
+.card {
+    width: 100% !important;
+    border-radius: 1.25rem;
+    border-width: 1px;
+    --tw-border-opacity: 1;
+    border-color: rgb(229 229 229 / var(--tw-border-opacity, 1));
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+    --tw-text-opacity: 1;
+    color: rgb(30 30 30 / var(--tw-text-opacity, 1));
+    --tw-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --tw-shadow-colored: 0 10px 25px -5px var(--tw-shadow-color), 0 4px 6px -2px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
