@@ -284,7 +284,7 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                             Details
                           </button>
                         </td>
-                      </tr>
+                      </motion.tr>
                       
                       {/* Expanded Service Steps */}
                       {expandedLogs.has(log.id) && (
