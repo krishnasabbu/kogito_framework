@@ -5,6 +5,7 @@ import { ArrowLeft, Clock, Calendar, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import StatCard from './StatCard';
 import TimeSeriesChart from './TimeSeriesChart';
 import DonutChart from './DonutChart';
