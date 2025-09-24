@@ -134,7 +134,7 @@ export default function ABTestDashboard() {
       </motion.div>
 
       {/* Dashboard Content */}
-      <div className="p-6 bg-bolt-bg dark:bg-bolt-bg-dark">
+      <div className="p-6 bg-gray-50 dark:bg-gray-900">
         {metricsLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -153,7 +153,7 @@ export default function ABTestDashboard() {
 
             <TabsContent value="overview" className="space-y-6">
               {/* Stat Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                   title="Total Runs"
                   value={metrics.totalRuns}
@@ -185,7 +185,7 @@ export default function ABTestDashboard() {
               </div>
 
               {/* Charts Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <DonutChart
                   title="Traffic Distribution"
                   optionAPercentage={test.trafficSplit}

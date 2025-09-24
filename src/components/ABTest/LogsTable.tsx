@@ -139,10 +139,10 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
 
   const getOptionBadge = (option: 'A' | 'B') => {
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+      <span className={`px-3 py-1 text-xs font-medium rounded-full shadow-sm ${
         option === 'A' 
-          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-          : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+          : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800'
       }`}>
         Option {option}
       </span>
@@ -151,11 +151,11 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
 
   const getMethodColor = (method: string) => {
     switch (method) {
-      case 'GET': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-      case 'POST': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-      case 'PUT': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case 'DELETE': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+      case 'GET': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800';
+      case 'POST': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800';
+      case 'PUT': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800';
+      case 'DELETE': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600';
     }
   };
 
@@ -166,26 +166,26 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card className="bg-bolt-surface dark:bg-bolt-surface-dark border-bolt-border dark:border-bolt-border-dark">
+        <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg text-bolt-text-primary dark:text-bolt-text-primary-dark">{title}</CardTitle>
+              <CardTitle className="text-lg text-gray-900 dark:text-white">{title}</CardTitle>
               <div className="flex items-center gap-2">
                 <div className="relative">
-                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bolt-text-secondary dark:text-bolt-text-secondary-dark" />
+                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                   <Input
                     placeholder="Search logs..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 w-48 bg-bolt-bg dark:bg-bolt-bg-dark border-bolt-border dark:border-bolt-border-dark"
+                    className="pl-9 w-48 bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                   />
                 </div>
                 
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32 bg-bolt-bg dark:bg-bolt-bg-dark border-bolt-border dark:border-bolt-border-dark">
+                  <SelectTrigger className="w-32 bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-bolt-surface dark:bg-bolt-surface-dark border-bolt-border dark:border-bolt-border-dark">
+                  <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="success">Success</SelectItem>
                     <SelectItem value="error">Error</SelectItem>
@@ -193,10 +193,10 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                 </Select>
                 
                 <Select value={optionFilter} onValueChange={setOptionFilter}>
-                  <SelectTrigger className="w-32 bg-bolt-bg dark:bg-bolt-bg-dark border-bolt-border dark:border-bolt-border-dark">
+                  <SelectTrigger className="w-32 bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                     <SelectValue placeholder="Option" />
                   </SelectTrigger>
-                  <SelectContent className="bg-bolt-surface dark:bg-bolt-surface-dark border-bolt-border dark:border-bolt-border-dark">
+                  <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                     <SelectItem value="all">All Options</SelectItem>
                     <SelectItem value="A">Option A</SelectItem>
                     <SelectItem value="B">Option B</SelectItem>
@@ -209,26 +209,26 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-bolt-border dark:border-bolt-border-dark bg-bolt-surface-alt dark:bg-bolt-surface-alt-dark">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                  <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Execution ID
                     </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Option
                     </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Status
                     </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Duration
                     </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Service
                     </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Timestamp
                     </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Actions
                     </th>
                   </tr>
@@ -240,12 +240,12 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.2, delay: index * 0.02 }}
-                        className="border-b border-bolt-border dark:border-bolt-border-dark hover:bg-bolt-surface-alt dark:hover:bg-bolt-surface-alt-dark"
+                        className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200"
                       >
-                        <td className="py-3 px-4 text-sm text-bolt-text-primary dark:text-bolt-text-primary-dark font-mono">
+                        <td className="py-4 px-6 text-sm text-gray-900 dark:text-white font-mono">
                           <button
                             onClick={() => toggleLogExpansion(log.id)}
-                            className="flex items-center gap-2 hover:text-wells-red transition-colors"
+                            className="flex items-center gap-2 hover:text-wells-red transition-colors font-medium"
                           >
                             {expandedLogs.has(log.id) ? (
                               <ChevronDown size={14} />
@@ -255,30 +255,30 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                             {log.id.substring(0, 12)}...
                           </button>
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-4 px-6">
                           {getOptionBadge(log.option)}
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-4 px-6">
                           <div className="flex items-center gap-2">
                             {getStatusIcon(log.status)}
-                            <span className="text-sm text-bolt-text-primary dark:text-bolt-text-primary-dark capitalize">
+                            <span className="text-sm text-gray-900 dark:text-white capitalize font-medium">
                               {log.status}
                             </span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-sm text-bolt-text-primary dark:text-bolt-text-primary-dark">
+                        <td className="py-4 px-6 text-sm text-gray-900 dark:text-white font-medium">
                           {log.duration}ms
                         </td>
-                        <td className="py-3 px-4 text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                        <td className="py-4 px-6 text-sm text-gray-600 dark:text-gray-400">
                           {log.serviceName || '-'}
                         </td>
-                        <td className="py-3 px-4 text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                        <td className="py-4 px-6 text-sm text-gray-600 dark:text-gray-400">
                           {format(new Date(log.timestamp), 'MMM d, HH:mm:ss')}
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-4 px-6">
                           <button
                             onClick={() => setSelectedLog(log)}
-                            className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-wells-red hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-wells-red hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-105 shadow-sm"
                           >
                             <Eye size={14} />
                             Details
@@ -289,57 +289,66 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                       {/* Expanded Service Steps */}
                       {expandedLogs.has(log.id) && (
                         <tr>
-                          <td colSpan={7} className="px-4 pb-4">
-                            <div className="bg-bolt-surface-alt dark:bg-bolt-surface-alt-dark rounded-lg p-4 ml-8">
-                              <h4 className="text-sm font-medium text-bolt-text-primary dark:text-bolt-text-primary-dark mb-3">
-                                Service Execution Steps
+                          <td colSpan={7} className="px-6 pb-6">
+                            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 ml-8 border border-gray-200 dark:border-gray-700 shadow-inner">
+                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                <div className="w-2 h-2 bg-wells-red rounded-full"></div>
+                                Service Execution Journey
                               </h4>
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                 {log.serviceSteps.map((step, stepIndex) => (
                                   <div
                                     key={step.id}
-                                    className="flex items-start gap-4 p-3 bg-bolt-bg dark:bg-bolt-bg-dark rounded-lg border border-bolt-border dark:border-bolt-border-dark"
+                                    className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200"
                                   >
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-wells-red text-white text-xs flex items-center justify-center font-medium">
-                                      {stepIndex + 1}
-                                    </div>
-                                    
-                                    <div className="flex-1 space-y-2">
-                                      <div className="flex items-center gap-3">
-                                        <span className="font-medium text-bolt-text-primary dark:text-bolt-text-primary-dark">
-                                          {step.serviceName}
-                                        </span>
-                                        <span className={`px-2 py-1 text-xs font-medium rounded ${getMethodColor(step.method)}`}>
-                                          {step.method}
-                                        </span>
-                                        {getStatusIcon(step.status)}
-                                        <span className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
-                                          {step.duration}ms
-                                        </span>
+                                    <div className="flex items-center gap-4 mb-3">
+                                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-wells-red to-red-600 text-white text-xs flex items-center justify-center font-bold shadow-sm">
+                                        {stepIndex + 1}
                                       </div>
                                       
-                                      <div className="text-xs text-bolt-text-secondary dark:text-bolt-text-secondary-dark font-mono">
-                                        {step.url}
-                                      </div>
-                                      
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <div className="text-xs font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark mb-1">
-                                            Request:
-                                          </div>
-                                          <pre className="text-xs bg-bolt-surface dark:bg-bolt-surface-dark p-2 rounded border border-bolt-border dark:border-bolt-border-dark overflow-auto max-h-32 text-bolt-text-primary dark:text-bolt-text-primary-dark">
-                                            {JSON.stringify(step.request, null, 2)}
-                                          </pre>
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-1">
+                                          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                                            {step.serviceName}
+                                          </h3>
+                                          <span className={`px-2 py-1 text-xs font-medium rounded-full shadow-sm ${getMethodColor(step.method)}`}>
+                                            {step.method}
+                                          </span>
+                                          {getStatusIcon(step.status)}
+                                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                            {step.duration}ms
+                                          </span>
                                         </div>
                                         
-                                        <div>
-                                          <div className="text-xs font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark mb-1">
-                                            Response:
-                                          </div>
-                                          <pre className="text-xs bg-bolt-surface dark:bg-bolt-surface-dark p-2 rounded border border-bolt-border dark:border-bolt-border-dark overflow-auto max-h-32 text-bolt-text-primary dark:text-bolt-text-primary-dark">
-                                            {JSON.stringify(step.response, null, 2)}
-                                          </pre>
+                                        <div className="text-sm text-gray-600 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                          {step.url}
                                         </div>
+                                        
+                                        <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                          {format(new Date(step.timestamp), 'MMM d, yyyy HH:mm:ss.SSS')}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                      <div>
+                                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                          Request Payload
+                                        </h4>
+                                        <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-48 text-gray-900 dark:text-gray-100 shadow-inner">
+                                          {JSON.stringify(step.request, null, 2)}
+                                        </pre>
+                                      </div>
+                                      
+                                      <div>
+                                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                          Response Payload
+                                        </h4>
+                                        <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-48 text-gray-900 dark:text-gray-100 shadow-inner">
+                                          {JSON.stringify(step.response, null, 2)}
+                                        </pre>
                                       </div>
                                     </div>
                                   </div>
@@ -355,8 +364,8 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
               </table>
               
               {filteredLogs.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-bolt-text-secondary dark:text-bolt-text-secondary-dark">No logs found</p>
+                <div className="text-center py-12">
+                  <p className="text-gray-500 dark:text-gray-400">No logs found</p>
                 </div>
               )}
             </div>
@@ -366,94 +375,118 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
 
       {/* Detailed Log Modal */}
       {selectedLog && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-          <div className="bg-bolt-surface dark:bg-bolt-surface-dark rounded-lg shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col border border-bolt-border dark:border-bolt-border-dark">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-700 overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-bolt-border dark:border-bolt-border-dark">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
               <div>
-                <h2 className="text-xl font-bold text-bolt-text-primary dark:text-bolt-text-primary-dark">
-                  Execution Details: {selectedLog.id}
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                  <div className="w-3 h-3 bg-wells-red rounded-full shadow-sm"></div>
+                  Execution Journey
                 </h2>
                 <div className="flex items-center gap-4 mt-2">
                   {getOptionBadge(selectedLog.option)}
                   <div className="flex items-center gap-2">
                     {getStatusIcon(selectedLog.status)}
-                    <span className="text-sm text-bolt-text-primary dark:text-bolt-text-primary-dark capitalize">
+                    <span className="text-sm text-gray-900 dark:text-white capitalize font-medium">
                       {selectedLog.status}
                     </span>
                   </div>
-                  <span className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                     Total Duration: {selectedLog.duration}ms
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-mono bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+                    {selectedLog.id}
                   </span>
                 </div>
               </div>
               
               <button
                 onClick={() => setSelectedLog(null)}
-                className="p-2 text-bolt-text-secondary dark:text-bolt-text-secondary-dark hover:text-bolt-text-primary dark:hover:text-bolt-text-primary-dark hover:bg-bolt-surface-alt dark:hover:bg-bolt-surface-alt-dark rounded-lg transition-colors"
+                className="p-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 hover:scale-110"
               >
-                <XCircle size={20} />
+                <XCircle size={24} />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
               <div className="space-y-6">
                 {selectedLog.serviceSteps.map((step, index) => (
-                  <div
+                  <motion.div
                     key={step.id}
-                    className="bg-bolt-bg dark:bg-bolt-bg-dark p-6 rounded-lg border border-bolt-border dark:border-bolt-border-dark"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-wells-red text-white text-sm flex items-center justify-center font-medium">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-wells-red to-red-600 text-white text-sm flex items-center justify-center font-bold shadow-lg">
                         {index + 1}
                       </div>
                       
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-bolt-text-primary dark:text-bolt-text-primary-dark">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                             {step.serviceName}
                           </h3>
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${getMethodColor(step.method)}`}>
+                          <span className={`px-3 py-1 text-sm font-semibold rounded-full shadow-sm ${getMethodColor(step.method)}`}>
                             {step.method}
                           </span>
                           {getStatusIcon(step.status)}
-                          <span className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-bold bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                             {step.duration}ms
                           </span>
                         </div>
                         
-                        <div className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark font-mono">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
                           {step.url}
                         </div>
                         
-                        <div className="text-xs text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
-                          {format(new Date(step.timestamp), 'MMM d, yyyy HH:mm:ss.SSS')}
+                        <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 font-medium">
+                          Executed at: {format(new Date(step.timestamp), 'MMM d, yyyy HH:mm:ss.SSS')}
                         </div>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                       <div>
-                        <h4 className="text-sm font-medium text-bolt-text-primary dark:text-bolt-text-primary-dark mb-2">
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full shadow-sm"></div>
                           Request Payload
                         </h4>
-                        <pre className="text-xs bg-bolt-surface dark:bg-bolt-surface-dark p-4 rounded border border-bolt-border dark:border-bolt-border-dark overflow-auto max-h-64 text-bolt-text-primary dark:text-bolt-text-primary-dark">
+                        <pre className="text-sm bg-gray-100 dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700 overflow-auto max-h-64 text-gray-900 dark:text-gray-100 shadow-inner font-mono leading-relaxed">
                           {JSON.stringify(step.request, null, 2)}
                         </pre>
                       </div>
                       
                       <div>
-                        <h4 className="text-sm font-medium text-bolt-text-primary dark:text-bolt-text-primary-dark mb-2">
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                          <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
                           Response Payload
                         </h4>
-                        <pre className="text-xs bg-bolt-surface dark:bg-bolt-surface-dark p-4 rounded border border-bolt-border dark:border-bolt-border-dark overflow-auto max-h-64 text-bolt-text-primary dark:text-bolt-text-primary-dark">
+                        <pre className="text-sm bg-gray-100 dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700 overflow-auto max-h-64 text-gray-900 dark:text-gray-100 shadow-inner font-mono leading-relaxed">
                           {JSON.stringify(step.response, null, 2)}
                         </pre>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-medium">Execution Summary:</span> {selectedLog.serviceSteps.length} services • Total {selectedLog.duration}ms
+                </div>
+                <button
+                  onClick={() => setSelectedLog(null)}
+                  className="px-6 py-2 bg-wells-red text-white hover:bg-red-700 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg font-medium"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

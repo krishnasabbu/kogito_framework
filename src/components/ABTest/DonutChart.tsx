@@ -27,8 +27,8 @@ export default function DonutChart({
     if (active && payload && payload.length) {
       const data = payload[0];
       return (
-        <div className="bg-bolt-surface dark:bg-bolt-surface-dark p-3 border border-bolt-border dark:border-bolt-border-dark rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-bolt-text-primary dark:text-bolt-text-primary-dark">
+        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+          <p className="text-sm font-medium text-gray-900 dark:text-white">
             {data.name}: {data.value}%
           </p>
         </div>
@@ -43,9 +43,9 @@ export default function DonutChart({
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="bg-bolt-surface dark:bg-bolt-surface-dark border-bolt-border dark:border-bolt-border-dark">
+      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <CardHeader>
-          <CardTitle className="text-lg text-bolt-text-primary dark:text-bolt-text-primary-dark">{title}</CardTitle>
+          <CardTitle className="text-lg text-gray-900 dark:text-white">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>

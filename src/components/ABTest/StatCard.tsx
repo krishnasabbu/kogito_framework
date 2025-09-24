@@ -58,9 +58,9 @@ export default function StatCard({ title, value, change, icon: Icon, color = 'bl
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className="bg-bolt-surface dark:bg-bolt-surface-dark border-bolt-border dark:border-bolt-border-dark">
+      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-bolt-text-secondary dark:text-bolt-text-secondary-dark">
+          <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
             {title}
           </CardTitle>
           <div className={`p-2 rounded-lg ${colorClasses.bg}`}>
@@ -68,7 +68,7 @@ export default function StatCard({ title, value, change, icon: Icon, color = 'bl
           </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-bolt-text-primary dark:text-bolt-text-primary-dark">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </div>
           {change && (
