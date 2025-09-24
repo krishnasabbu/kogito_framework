@@ -6,6 +6,9 @@ import WorkflowList from './WorkflowList';
 import WorkflowEditor from './WorkflowEditor';
 import ABTestList from './ABTestList';
 import ABTestCreator from './ABTestCreator';
+import ABTestListPage from '../ABTest/ABTestListPage';
+import ABTestConfiguration from '../ABTest/ABTestConfiguration';
+import ABTestDashboard from '../ABTest/ABTestDashboard';
 import IDEInterface from '../IDE/IDEInterface';
 import { useKogitoStore } from '../../stores/kogitoStore';
 
@@ -23,7 +26,9 @@ export default function KogitoApp() {
           <Route path="workflows/new" element={<WorkflowEditor />} />
           <Route path="workflows/:id/edit" element={<WorkflowEditor />} />
           <Route path="workflows/:projectId/run" element={<IDEInterface />} />
-          <Route path="ab-tests" element={<ABTestList />} />
+          <Route path="ab-tests" element={<ABTestListPage />} />
+          <Route path="ab-tests/new" element={<ABTestConfiguration />} />
+          <Route path="ab-tests/:testId/dashboard" element={<ABTestDashboard />} />
         </Routes>
       </main>
 
