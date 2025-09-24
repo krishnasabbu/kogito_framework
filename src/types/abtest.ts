@@ -57,6 +57,19 @@ export interface ExecutionLog {
   timestamp: string;
   errorMessage?: string;
   serviceName?: string;
+  serviceSteps: ServiceStep[];
+}
+
+export interface ServiceStep {
+  id: string;
+  serviceName: string;
+  method: string;
+  url: string;
+  status: 'success' | 'error';
+  duration: number;
+  request: any;
+  response: any;
+  timestamp: string;
 }
 
 export interface TimeFilter {

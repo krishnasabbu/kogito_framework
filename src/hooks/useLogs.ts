@@ -16,7 +16,8 @@ const generateMockLogs = (testId: string, count: number = 100): ExecutionLog[] =
       duration: Math.floor(Math.random() * 3000) + 200,
       timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
       errorMessage: status === 'error' ? 'Service timeout' : undefined,
-      serviceName: services[Math.floor(Math.random() * services.length)]
+      serviceName: services[Math.floor(Math.random() * services.length)],
+      serviceSteps: []
     };
   }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 };

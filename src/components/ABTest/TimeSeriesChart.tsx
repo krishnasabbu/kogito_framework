@@ -18,8 +18,8 @@ export default function TimeSeriesChart({ data, title }: TimeSeriesChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+        <div className="bg-bolt-surface dark:bg-bolt-surface-dark p-3 border border-bolt-border dark:border-bolt-border-dark rounded-lg shadow-lg">
+          <p className="text-sm font-medium text-bolt-text-primary dark:text-bolt-text-primary-dark mb-2">
             {format(new Date(label), 'MMM d, HH:mm')}
           </p>
           {payload.map((entry: any, index: number) => (
@@ -39,9 +39,9 @@ export default function TimeSeriesChart({ data, title }: TimeSeriesChartProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card>
+      <Card className="bg-bolt-surface dark:bg-bolt-surface-dark border-bolt-border dark:border-bolt-border-dark">
         <CardHeader>
-          <CardTitle className="text-lg">{title}</CardTitle>
+          <CardTitle className="text-lg text-bolt-text-primary dark:text-bolt-text-primary-dark">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>

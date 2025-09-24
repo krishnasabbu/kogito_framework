@@ -134,7 +134,7 @@ export default function ABTestDashboard() {
       </motion.div>
 
       {/* Dashboard Content */}
-      <div className="p-6">
+      <div className="p-6 bg-bolt-bg dark:bg-bolt-bg-dark">
         {metricsLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -153,7 +153,7 @@ export default function ABTestDashboard() {
 
             <TabsContent value="overview" className="space-y-6">
               {/* Stat Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
                   title="Total Runs"
                   value={metrics.totalRuns}
@@ -185,7 +185,7 @@ export default function ABTestDashboard() {
               </div>
 
               {/* Charts Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <DonutChart
                   title="Traffic Distribution"
                   optionAPercentage={test.trafficSplit}
@@ -201,9 +201,9 @@ export default function ABTestDashboard() {
               </div>
             </TabsContent>
 
-            <TabsContent value="performance" className="space-y-6">
+            <TabsContent value="performance" className="space-y-8">
               {/* Performance Comparison */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -296,14 +296,16 @@ export default function ABTestDashboard() {
               </div>
 
               {/* Service Executions Bar Chart */}
+              <div className="mt-8">
               <TimeSeriesChart
                 title="Service Execution Trends"
                 data={metrics.timeSeriesData}
               />
+              </div>
             </TabsContent>
 
             <TabsContent value="logs">
-              <LogsTable logs={logs} title="Execution Logs" />
+              <LogsTable logs={logs} title="Execution Logs" testId={testId!} />
             </TabsContent>
 
             <TabsContent value="timeline">

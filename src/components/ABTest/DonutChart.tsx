@@ -27,8 +27,8 @@ export default function DonutChart({
     if (active && payload && payload.length) {
       const data = payload[0];
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        <div className="bg-bolt-surface dark:bg-bolt-surface-dark p-3 border border-bolt-border dark:border-bolt-border-dark rounded-lg shadow-lg">
+          <p className="text-sm font-medium text-bolt-text-primary dark:text-bolt-text-primary-dark">
             {data.name}: {data.value}%
           </p>
         </div>
@@ -43,9 +43,9 @@ export default function DonutChart({
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <Card>
+      <Card className="bg-bolt-surface dark:bg-bolt-surface-dark border-bolt-border dark:border-bolt-border-dark">
         <CardHeader>
-          <CardTitle className="text-lg">{title}</CardTitle>
+          <CardTitle className="text-lg text-bolt-text-primary dark:text-bolt-text-primary-dark">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
@@ -71,16 +71,16 @@ export default function DonutChart({
           {/* Summary */}
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              <div className="text-2xl font-bold text-wells-red">
                 {optionAPercentage}%
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">{optionAName}</div>
+              <div className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">{optionAName}</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <div className="text-2xl font-bold text-wells-gold">
                 {optionBPercentage}%
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">{optionBName}</div>
+              <div className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">{optionBName}</div>
             </div>
           </div>
         </CardContent>
