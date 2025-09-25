@@ -505,7 +505,7 @@ class ABTestApiService {
             },
             lastUpdated: new Date().toISOString()
           }
-        })
+        };
       }
     );
   }
