@@ -137,14 +137,14 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
     }
   };
 
-  const getOptionBadge = (option: 'A' | 'B') => {
+  const getOptionBadge = (armKey: 'a' | 'b') => {
     return (
       <span className={`px-3 py-1 text-xs font-medium rounded-full shadow-sm ${
-        option === 'A' 
+        armKey === 'a' 
           ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
           : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800'
       }`}>
-        Option {option}
+        {armKey.toUpperCase()}
       </span>
     );
   };
@@ -256,7 +256,7 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                           </button>
                         </td>
                         <td className="py-4 px-6">
-                          {getOptionBadge(log.option)}
+                          {getOptionBadge(log.armKey)}
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-2">
@@ -410,7 +410,44 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
+            <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-800">
+              {/* Execution Overview */}
+              <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Request Payload</h4>
+                  <pre className="text-xs bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-32 text-gray-900 dark:text-white font-mono">
+                    {JSON.stringify(selectedLog.requestPayload, null, 2)}
+                  </pre>
+                </div>
+                
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Response Payload</h4>
+                  <pre className="text-xs bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-32 text-gray-900 dark:text-white font-mono">
+                    {JSON.stringify(selectedLog.responsePayload, null, 2)}
+                  </pre>
+                </div>
+              </div>
+              
+              {/* Execution Path */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-wells-red rounded-full"></div>
+                  Execution Path
+                </h4>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {selectedLog.executionPath.map((activity, index) => (
+                    <React.Fragment key={activity}>
+                      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium rounded-full border border-blue-200 dark:border-blue-800">
+                        {activity.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                      {index < selectedLog.executionPath.length - 1 && (
+                        <span className="text-gray-400">→</span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+              
               <div className="space-y-6">
                 {selectedLog.serviceSteps.map((step, index) => (
                   <motion.div
