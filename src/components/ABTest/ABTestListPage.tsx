@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 
 export default function ABTestListPage() {
   const navigate = useNavigate();
-  const { tests, loading, updateTest } = useABTests();
+  const { tests, loading, startTest, stopTest } = useABTests();
 
   const handleViewTest = (test: ABTestConfig) => {
     navigate(`/kogito/ab-tests/${test.id}/dashboard`);
@@ -18,11 +18,15 @@ export default function ABTestListPage() {
 
   const handleToggleStatus = async (test: ABTestConfig) => {
     try {
-      const newStatus = test.status === 'running' ? 'stopped' : 'running';
-      await updateTest(test.id, { status: newStatus });
-      toast.success(`Test ${newStatus === 'running' ? 'started' : 'stopped'} successfully`);
+      if (test.status === 'running') {
+        await stopTest(test.id);
+        toast.success('Test stopped successfully');
+      } else {
+        await startTest(test.id);
+        toast.success('Test started successfully');
+      }
     } catch (error) {
-      toast.error('Failed to update test status');
+      toast.error(error instanceof Error ? error.message : 'Failed to update test status');
     }
   };
 

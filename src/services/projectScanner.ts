@@ -1,4 +1,5 @@
 import { BpmnFile, ProjectScanResult } from '../types/abtest';
+import { abTestApiService } from './abTestApiService';
 
 export class ProjectScannerService {
   private static readonly BPMN_EXTENSIONS = ['.bpmn', '.bpmn2', '.bpmn.xml'];
@@ -9,46 +10,17 @@ export class ProjectScannerService {
    */
   async scanProject(projectPath: string): Promise<ProjectScanResult> {
     try {
-      // Validate project path
-      if (!projectPath || !projectPath.trim()) {
-        throw new Error('Project path is required');
+      const response = await abTestApiService.scanProject({ projectPath });
+      if (response.success && response.data) {
+        return {
+          projectPath: this.normalizePath(projectPath),
+          bpmnFiles: response.data.bpmnFiles,
+          resourcesPath: response.data.resourcesPath,
+          processesPath: response.data.processesPath
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to scan project');
       }
-
-      const normalizedPath = this.normalizePath(projectPath);
-      
-      // Try primary lookup paths
-      const primaryPaths = [
-        `${normalizedPath}/src/main/resources`,
-        `${normalizedPath}/src/main/resources/processes`
-      ];
-
-      let resourcesPath = '';
-      let bpmnFiles: BpmnFile[] = [];
-
-      // Check primary paths first
-      for (const path of primaryPaths) {
-        if (await this.pathExists(path)) {
-          resourcesPath = path;
-          bpmnFiles = await this.scanDirectory(path, path);
-          break;
-        }
-      }
-
-      // Fallback to recursive scan if no primary path found
-      if (bpmnFiles.length === 0) {
-        resourcesPath = normalizedPath;
-        bpmnFiles = await this.recursiveScan(normalizedPath);
-      }
-
-      // Deduplicate and sort
-      const uniqueFiles = this.deduplicateFiles(bpmnFiles);
-      
-      return {
-        projectPath: normalizedPath,
-        bpmnFiles: uniqueFiles,
-        resourcesPath,
-        processesPath: primaryPaths[1]
-      };
     } catch (error) {
       console.error('Project scan failed:', error);
       throw new Error(`Failed to scan project: ${error instanceof Error ? error.message : 'Unknown error'}`);

@@ -1,66 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ABTestConfig, ABTestArm } from '../types/abtest';
-import { listenerGenerator } from '../services/listenerGenerator';
+import { abTestApiService } from '../services/abTestApiService';
 
-// Mock data
-let mockABTests: ABTestConfig[] = [
-  {
-    id: 'test-1',
-    name: 'Order Processing Optimization',
-    description: 'Testing standard vs optimized order processing flow',
-    springProjectPath: '/home/project/spring-boot-app',
-    arms: [
-      {
-        armKey: 'a',
-        armName: 'Standard Flow',
-        bpmnFile: 'order-processing-v1.bpmn',
-        processDefinitionKey: 'order_processing_v1'
-      },
-      {
-        armKey: 'b', 
-        armName: 'Optimized Flow',
-        bpmnFile: 'order-processing-v2.bpmn',
-        processDefinitionKey: 'order_processing_v2'
-      }
-    ],
-    trafficSplit: 50,
-    generateListener: true,
-    listenerConfig: {
-      packageName: 'com.flowforge.listener',
-      className: 'OrderProcessingABTestListener',
-      filePath: '/home/project/spring-boot-app/src/main/java/com/flowforge/listener/OrderProcessingABTestListener.java',
-      generated: true
-    },
-    status: 'running',
-    createdAt: '2024-01-20T10:00:00Z',
-    updatedAt: '2024-01-25T15:30:00Z'
-  },
-  {
-    id: 'test-2',
-    name: 'Payment Gateway Comparison',
-    description: 'Comparing different payment gateway implementations',
-    springProjectPath: '/home/project/payment-service',
-    arms: [
-      {
-        armKey: 'a',
-        armName: 'Payment Gateway A',
-        bpmnFile: 'payment-flow-standard.bpmn',
-        processDefinitionKey: 'payment_flow_standard'
-      },
-      {
-        armKey: 'b',
-        armName: 'Payment Gateway B', 
-        bpmnFile: 'payment-flow-optimized.bpmn',
-        processDefinitionKey: 'payment_flow_optimized'
-      }
-    ],
-    trafficSplit: 30,
-    generateListener: true,
-    status: 'stopped',
-    createdAt: '2024-01-15T09:00:00Z',
-    updatedAt: '2024-01-22T11:45:00Z'
-  }
-];
 
 export function useABTests() {
   const [tests, setTests] = useState<ABTestConfig[]>([]);
@@ -68,14 +9,17 @@ export function useABTests() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call
     const fetchTests = async () => {
       try {
         setLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setTests(mockABTests);
+        const response = await abTestApiService.getAllABTests();
+        if (response.success && response.data) {
+          setTests(response.data);
+        } else {
+          throw new Error(response.message || 'Failed to fetch tests');
+        }
       } catch (err) {
-        setError('Failed to fetch A/B tests');
+        setError(err instanceof Error ? err.message : 'Failed to fetch A/B tests');
       } finally {
         setLoading(false);
       }
@@ -86,27 +30,115 @@ export function useABTests() {
 
   const createTest = async (testData: Omit<ABTestConfig, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      // Generate listener if requested
-      let listenerConfig = undefined;
-      if (testData.generateListener) {
-        const tempTest = {
+      const createRequest = {
+        name: testData.name,
+        description: testData.description,
+        springProjectPath: testData.springProjectPath,
+        arms: testData.arms.map(arm => ({
+          armKey: arm.armKey,
+          armName: arm.armName,
+          bpmnFile: arm.bpmnFile,
+          customLabel: arm.customLabel,
+          processDefinitionKey: arm.processDefinitionKey
+        })),
+        trafficSplit: testData.trafficSplit,
+        generateListener: testData.generateListener
+      };
+
+      const response = await abTestApiService.createABTest(createRequest);
+      if (response.success && response.data) {
+        const newTest: ABTestConfig = {
           ...testData,
-          id: `temp-${Date.now()}`,
+          id: response.data.testId,
+          listenerConfig: response.data.listenerGenerated ? {
+            packageName: 'com.flowforge.listener',
+            className: 'ABTestListener',
+            filePath: response.data.listenerPath || '',
+            generated: true
+          } : undefined,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
         
-        const { code, config } = listenerGenerator.generateListener(tempTest);
-        
-        // In a real implementation, this would inject the listener into the project
-        const injected = await listenerGenerator.injectListener(tempTest, code, config);
-        
-        if (injected) {
-          listenerConfig = { ...config, generated: true };
-        }
+        setTests(prev => [...prev, newTest]);
+        return newTest;
+      } else {
+        throw new Error(response.data?.message || 'Failed to create test');
       }
-      
-      const newTest: ABTestConfig = {
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to create A/B test');
+    }
+  };
+
+  const updateTest = async (id: string, updates: Partial<ABTestConfig>) => {
+    try {
+      const response = await abTestApiService.updateABTest(id, updates);
+      if (response.success && response.data) {
+        setTests(prev => prev.map(test => 
+          test.id === id ? { ...test, ...response.data } : test
+        ));
+      } else {
+        throw new Error(response.message || 'Failed to update test');
+      }
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to update A/B test');
+    }
+  };
+
+  const startTest = async (id: string) => {
+    try {
+      const response = await abTestApiService.startABTest(id);
+      if (response.success) {
+        setTests(prev => prev.map(test => 
+          test.id === id ? { ...test, status: 'running', updatedAt: new Date().toISOString() } : test
+        ));
+      } else {
+        throw new Error(response.message || 'Failed to start test');
+      }
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to start A/B test');
+    }
+  };
+
+  const stopTest = async (id: string) => {
+    try {
+      const response = await abTestApiService.stopABTest(id);
+      if (response.success) {
+        setTests(prev => prev.map(test => 
+          test.id === id ? { ...test, status: 'stopped', updatedAt: new Date().toISOString() } : test
+        ));
+      } else {
+        throw new Error(response.message || 'Failed to stop test');
+      }
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to stop A/B test');
+    }
+  };
+
+  const deleteTest = async (id: string) => {
+    try {
+      const response = await abTestApiService.deleteABTest(id);
+      if (response.success) {
+        setTests(prev => prev.filter(test => test.id !== id));
+      } else {
+        throw new Error(response.message || 'Failed to delete test');
+      }
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to delete A/B test');
+    }
+  };
+
+  return {
+    tests,
+    loading,
+    error,
+    createTest,
+    updateTest,
+    startTest,
+    stopTest,
+    deleteTest
+  };
+}
         ...testData,
         id: `test-${Date.now()}`,
         listenerConfig,
