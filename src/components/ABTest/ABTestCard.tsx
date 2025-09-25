@@ -76,7 +76,7 @@ export default function ABTestCard({ test, onView, onToggleStatus }: ABTestCardP
         <span>{format(new Date(test.updatedAt), 'MMM d, yyyy')}</span>
       </div>
       <div className="flex items-center gap-2">
-        <span>Option A: {test.optionA.name}</span> / <span>Option B: {test.optionB.name}</span>
+        <span>{test.arms[0]?.armName || 'First Arm'}</span> / <span>{test.arms[1]?.armName || 'Second Arm'}</span>
       </div>
       <div className="flex items-center gap-2">
         <span>v1.0.0</span>
@@ -85,32 +85,50 @@ export default function ABTestCard({ test, onView, onToggleStatus }: ABTestCardP
 
     {/* Tags / Labels */}
     <div className="flex flex-wrap gap-2 mt-4 mb-4">
-      <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full border border-blue-200 dark:border-blue-800">
-        Option A
-      </span>
-      <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full border border-green-200 dark:border-green-800">
-        Option B
-      </span>
+      {test.arms.map((arm, index) => (
+        <span
+          key={arm.armKey}
+          className={`px-2 py-1 text-xs rounded-full border ${
+            index === 0 
+              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+              : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800'
+          }`}
+        >
+          {arm.armName}
+        </span>
+      ))}
       <span className="px-2 py-1 text-xs bg-light-surface dark:bg-dark-surface-alt text-light-text-secondary dark:text-dark-text-secondary rounded-full border border-light-border dark:border-dark-border">
-        +1
+        {test.generateListener ? 'Listener' : 'Manual'}
       </span>
     </div>
 
     {/* BPMN Files (scrollable) */}
     <div className="flex-1 overflow-auto space-y-3 mb-4">
-      <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-        <div className="text-xs font-medium text-blue-800 dark:text-blue-300 mb-1">Option A</div>
-        <div className="text-sm text-blue-700 dark:text-blue-400 font-mono truncate">
-          {test.optionA.bpmnFile}
+      {test.arms.map((arm, index) => (
+        <div
+          key={arm.armKey}
+          className={`p-3 rounded-lg border ${
+            index === 0
+              ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+              : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+          }`}
+        >
+          <div className={`text-xs font-medium mb-1 ${
+            index === 0 
+              ? 'text-blue-800 dark:text-blue-300'
+              : 'text-green-800 dark:text-green-300'
+          }`}>
+            {arm.armName}
+          </div>
+          <div className={`text-sm font-mono truncate ${
+            index === 0
+              ? 'text-blue-700 dark:text-blue-400'
+              : 'text-green-700 dark:text-green-400'
+          }`}>
+            {arm.bpmnFile}
+          </div>
         </div>
-      </div>
-
-      <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
-        <div className="text-xs font-medium text-green-800 dark:text-green-300 mb-1">Option B</div>
-        <div className="text-sm text-green-700 dark:text-green-400 font-mono truncate">
-          {test.optionB.bpmnFile}
-        </div>
-      </div>
+      ))}
     </div>
 
     {/* Actions */}

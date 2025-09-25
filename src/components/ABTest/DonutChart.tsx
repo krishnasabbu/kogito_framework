@@ -4,24 +4,24 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 interface DonutChartProps {
-  optionAPercentage: number;
-  optionBPercentage: number;
-  optionAName: string;
-  optionBName: string;
+  arms: Array<{
+    armKey: string;
+    armName: string;
+    percentage: number;
+    color: string;
+  }>;
   title: string;
 }
 
 export default function DonutChart({ 
-  optionAPercentage, 
-  optionBPercentage, 
-  optionAName, 
-  optionBName, 
+  arms,
   title 
 }: DonutChartProps) {
-  const data = [
-    { name: optionAName, value: optionAPercentage, color: '#3B82F6' },
-    { name: optionBName, value: optionBPercentage, color: '#10B981' }
-  ];
+  const data = arms.map(arm => ({
+    name: arm.armName,
+    value: arm.percentage,
+    color: arm.color
+  }));
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -70,18 +70,14 @@ export default function DonutChart({
           
           {/* Summary */}
           <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-wells-red">
-                {optionAPercentage}%
+            {arms.map((arm, index) => (
+              <div key={arm.armKey} className="text-center">
+                <div className="text-2xl font-bold" style={{ color: arm.color }}>
+                  {arm.percentage}%
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{arm.armName}</div>
               </div>
-              <div className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">{optionAName}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-wells-gold">
-                {optionBPercentage}%
-              </div>
-              <div className="text-sm text-bolt-text-secondary dark:text-bolt-text-secondary-dark">{optionBName}</div>
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>

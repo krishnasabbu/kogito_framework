@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
+import EnhancedMetricsPanel from './EnhancedMetricsPanel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
@@ -146,6 +147,7 @@ export default function ABTestDashboard() {
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="enhanced">Enhanced Metrics</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
           <TabsTrigger value="logs">Execution Logs</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
@@ -188,10 +190,12 @@ export default function ABTestDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <DonutChart
               title="Traffic Distribution"
-              optionAPercentage={test.trafficSplit}
-              optionBPercentage={100 - test.trafficSplit}
-              optionAName={test.optionA.name}
-              optionBName={test.optionB.name}
+              arms={test.arms.map((arm, index) => ({
+                armKey: arm.armKey,
+                armName: arm.armName,
+                percentage: index === 0 ? test.trafficSplit : 100 - test.trafficSplit,
+                color: index === 0 ? '#3B82F6' : '#10B981'
+              }))}
             />
             
             <TimeSeriesChart
@@ -199,6 +203,10 @@ export default function ABTestDashboard() {
               data={metrics.timeSeriesData}
             />
           </div>
+        </TabsContent>
+
+        <TabsContent value="enhanced" className="space-y-6">
+          <EnhancedMetricsPanel metrics={metrics} testName={test.name} />
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-8">

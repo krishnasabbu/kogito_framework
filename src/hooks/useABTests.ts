@@ -1,20 +1,36 @@
 import { useState, useEffect } from 'react';
-import { ABTestConfig } from '../types/abtest';
+import { ABTestConfig, ABTestArm } from '../types/abtest';
+import { listenerGenerator } from '../services/listenerGenerator';
 
 // Mock data
-const mockABTests: ABTestConfig[] = [
+let mockABTests: ABTestConfig[] = [
   {
     id: 'test-1',
     name: 'Order Processing Optimization',
-    optionA: {
-      name: 'Standard Flow',
-      bpmnFile: 'standard-order-flow.bpmn'
-    },
-    optionB: {
-      name: 'Optimized Flow',
-      bpmnFile: 'optimized-order-flow.bpmn'
-    },
+    description: 'Testing standard vs optimized order processing flow',
+    springProjectPath: '/home/project/spring-boot-app',
+    arms: [
+      {
+        armKey: 'a',
+        armName: 'Standard Flow',
+        bpmnFile: 'order-processing-v1.bpmn',
+        processDefinitionKey: 'order_processing_v1'
+      },
+      {
+        armKey: 'b', 
+        armName: 'Optimized Flow',
+        bpmnFile: 'order-processing-v2.bpmn',
+        processDefinitionKey: 'order_processing_v2'
+      }
+    ],
     trafficSplit: 50,
+    generateListener: true,
+    listenerConfig: {
+      packageName: 'com.flowforge.listener',
+      className: 'OrderProcessingABTestListener',
+      filePath: '/home/project/spring-boot-app/src/main/java/com/flowforge/listener/OrderProcessingABTestListener.java',
+      generated: true
+    },
     status: 'running',
     createdAt: '2024-01-20T10:00:00Z',
     updatedAt: '2024-01-25T15:30:00Z'
@@ -22,15 +38,24 @@ const mockABTests: ABTestConfig[] = [
   {
     id: 'test-2',
     name: 'Payment Gateway Comparison',
-    optionA: {
-      name: 'Gateway A',
-      bpmnFile: 'payment-gateway-a.bpmn'
-    },
-    optionB: {
-      name: 'Gateway B',
-      bpmnFile: 'payment-gateway-b.bpmn'
-    },
+    description: 'Comparing different payment gateway implementations',
+    springProjectPath: '/home/project/payment-service',
+    arms: [
+      {
+        armKey: 'a',
+        armName: 'Payment Gateway A',
+        bpmnFile: 'payment-flow-standard.bpmn',
+        processDefinitionKey: 'payment_flow_standard'
+      },
+      {
+        armKey: 'b',
+        armName: 'Payment Gateway B', 
+        bpmnFile: 'payment-flow-optimized.bpmn',
+        processDefinitionKey: 'payment_flow_optimized'
+      }
+    ],
     trafficSplit: 30,
+    generateListener: true,
     status: 'stopped',
     createdAt: '2024-01-15T09:00:00Z',
     updatedAt: '2024-01-22T11:45:00Z'
@@ -61,9 +86,30 @@ export function useABTests() {
 
   const createTest = async (testData: Omit<ABTestConfig, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
+      // Generate listener if requested
+      let listenerConfig = undefined;
+      if (testData.generateListener) {
+        const tempTest = {
+          ...testData,
+          id: `temp-${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        
+        const { code, config } = listenerGenerator.generateListener(tempTest);
+        
+        // In a real implementation, this would inject the listener into the project
+        const injected = await listenerGenerator.injectListener(tempTest, code, config);
+        
+        if (injected) {
+          listenerConfig = { ...config, generated: true };
+        }
+      }
+      
       const newTest: ABTestConfig = {
         ...testData,
         id: `test-${Date.now()}`,
+        listenerConfig,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
