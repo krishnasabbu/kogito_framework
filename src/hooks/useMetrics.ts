@@ -25,22 +25,34 @@ const generateMockMetrics = (testId: string, armKeys: string[] = ['a', 'b']): AB
   });
 
   // Generate enhanced time series data
-  const timeSeriesData = Array.from({ length: 48 }, (_, i) => {
+  const timeSeriesData = Array.from({ length: 24 }, (_, i) => {
     const timestamp = new Date(Date.now() - (23 - i) * 60 * 60 * 1000).toISOString();
     const armData: Record<string, any> = {};
     
     armKeys.forEach(key => {
+      const baseRequests = 50 + Math.sin(i * 0.3) * 30 + Math.random() * 20;
+      const successMultiplier = key === 'a' ? 0.85 : 0.92; // B performs better
+      const errorRate = key === 'a' ? 0.15 : 0.08;
+      
       armData[key] = {
-        requests: Math.floor(Math.random() * 100) + 20,
-        success: Math.floor(Math.random() * 90) + 10,
-        errors: Math.floor(Math.random() * 10),
-        avgDuration: 800 + Math.random() * 400
+        requests: Math.floor(baseRequests),
+        success: Math.floor(baseRequests * successMultiplier),
+        errors: Math.floor(baseRequests * errorRate),
+        avgDuration: key === 'a' ? 1200 + Math.sin(i * 0.2) * 200 : 950 + Math.sin(i * 0.25) * 150
       };
     });
     
     return {
       timestamp,
-      armData
+      armData,
+      // Add direct properties for easier chart access
+      ...armKeys.reduce((acc, key) => ({
+        ...acc,
+        [`${key}Requests`]: armData[key].requests,
+        [`${key}Success`]: armData[key].success,
+        [`${key}Errors`]: armData[key].errors,
+        [`${key}AvgDuration`]: armData[key].avgDuration
+      }), {})
     };
   });
 

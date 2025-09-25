@@ -201,6 +201,8 @@ export default function ABTestDashboard() {
             <TimeSeriesChart
               title="Requests Over Time"
               data={metrics.timeSeriesData}
+              chartType="area"
+              showSuccess={true}
             />
           </div>
         </TabsContent>
@@ -300,8 +302,10 @@ export default function ABTestDashboard() {
           {/* Service Executions Bar Chart */}
           <div className="mt-8">
             <TimeSeriesChart
-              title="Service Execution Trends"
+              title="Performance Trends Over Time"
               data={metrics.timeSeriesData}
+              chartType="line"
+              showSuccess={false}
             />
           </div>
         </TabsContent>
