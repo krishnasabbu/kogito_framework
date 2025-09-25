@@ -165,21 +165,21 @@ export default function ABTestDashboard() {
             />
             <StatCard
               title="Option A Success Rate"
-              value={`${(metrics.optionAStats.successRate * 100).toFixed(1)}%`}
+              value={`${(metrics.armStats['a']?.successRate * 100 || 0).toFixed(1)}%`}
               icon={Target}
               color="green"
               change={{ value: 2.1, type: 'increase' }}
             />
             <StatCard
               title="Option B Success Rate"
-              value={`${(metrics.optionBStats.successRate * 100).toFixed(1)}%`}
+              value={`${(metrics.armStats['b']?.successRate * 100 || 0).toFixed(1)}%`}
               icon={Target}
               color="green"
               change={{ value: 5.3, type: 'increase' }}
             />
             <StatCard
               title="Avg Duration Diff"
-              value={`${Math.abs(metrics.optionAStats.avgDuration - metrics.optionBStats.avgDuration).toFixed(0)}ms`}
+              value={`${Math.abs((metrics.armStats['a']?.avgDuration || 0) - (metrics.armStats['b']?.avgDuration || 0)).toFixed(0)}ms`}
               icon={Timer}
               color="purple"
               change={{ value: 8.7, type: 'decrease' }}
@@ -217,20 +217,20 @@ export default function ABTestDashboard() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    Option A: {test.optionA.name}
+                    Option A: {test.arms[0]?.armName || 'Option A'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {metrics.optionAStats.runs.toLocaleString()}
+                        {metrics.armStats['a']?.runs.toLocaleString() || '0'}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Total Runs</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {(metrics.optionAStats.successRate * 100).toFixed(1)}%
+                        {(metrics.armStats['a']?.successRate * 100 || 0).toFixed(1)}%
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Success Rate</div>
                     </div>
@@ -239,13 +239,13 @@ export default function ABTestDashboard() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                        {(metrics.optionAStats.errorRate * 100).toFixed(1)}%
+                        {(metrics.armStats['a']?.errorRate * 100 || 0).toFixed(1)}%
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Error Rate</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                        {metrics.optionAStats.avgDuration.toFixed(0)}ms
+                        {(metrics.armStats['a']?.avgDuration || 0).toFixed(0)}ms
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Avg Duration</div>
                     </div>
@@ -259,20 +259,20 @@ export default function ABTestDashboard() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    Option B: {test.optionB.name}
+                    Option B: {test.arms[1]?.armName || 'Option B'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {metrics.optionBStats.runs.toLocaleString()}
+                        {metrics.armStats['b']?.runs.toLocaleString() || '0'}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Total Runs</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {(metrics.optionBStats.successRate * 100).toFixed(1)}%
+                        {(metrics.armStats['b']?.successRate * 100 || 0).toFixed(1)}%
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Success Rate</div>
                     </div>
@@ -281,13 +281,13 @@ export default function ABTestDashboard() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                        {(metrics.optionBStats.errorRate * 100).toFixed(1)}%
+                        {(metrics.armStats['b']?.errorRate * 100 || 0).toFixed(1)}%
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Error Rate</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                        {metrics.optionBStats.avgDuration.toFixed(0)}ms
+                        {(metrics.armStats['b']?.avgDuration || 0).toFixed(0)}ms
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">Avg Duration</div>
                     </div>
