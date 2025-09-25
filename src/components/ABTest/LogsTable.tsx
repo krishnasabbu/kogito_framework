@@ -140,11 +140,11 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
   const getOptionBadge = (armKey: 'a' | 'b') => {
     return (
       <span className={`px-3 py-1 text-xs font-medium rounded-full shadow-sm ${
-        armKey === 'a' 
+        armKey === 'a' || armKey === 'A'
           ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
           : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800'
       }`}>
-        {armKey.toUpperCase()}
+        {armKey ? armKey.toUpperCase() : 'N/A'}
       </span>
     );
   };
@@ -256,7 +256,7 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                           </button>
                         </td>
                         <td className="py-4 px-6">
-                          {getOptionBadge(log.armKey)}
+                          {getOptionBadge(log.option || log.armKey)}
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-2">
@@ -385,7 +385,7 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                   Execution Journey
                 </h2>
                 <div className="flex items-center gap-4 mt-2">
-                  {getOptionBadge(selectedLog.armKey)}
+                  {getOptionBadge(selectedLog.option || selectedLog.armKey)}
                   <div className="flex items-center gap-2">
                     {getStatusIcon(selectedLog.status)}
                     <span className="text-sm text-gray-900 dark:text-white capitalize font-medium">
