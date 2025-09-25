@@ -333,7 +333,7 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                       <div>
                                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                          <span className="w-3 h-3 bg-blue-500 rounded-full shadow-sm"></span>
                                           Request Payload
                                         </h4>
                                         <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-48 text-gray-900 dark:text-gray-100 shadow-inner">
@@ -343,7 +343,7 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                                       
                                       <div>
                                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                          <span className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></span>
                                           Response Payload
                                         </h4>
                                         <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-48 text-gray-900 dark:text-gray-100 shadow-inner">
