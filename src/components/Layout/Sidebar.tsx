@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  Workflow, 
+import {
+  Workflow,
   Server,
   BarChart3,
+  Trophy,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -18,6 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
     { path: '/kogito/workflows', label: 'Kogito Workflows', icon: Workflow },
     { path: '/services', label: 'Services', icon: Server },
     { path: '/kogito/ab-tests', label: 'A/B Tests', icon: BarChart3 },
+    { path: '/champion-challenge', label: 'Champion vs Challenge', icon: Trophy },
   ];
 
   return (
