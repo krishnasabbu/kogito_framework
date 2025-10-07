@@ -1,39 +1,3 @@
-// Master: Comparison definition
-export interface ChampionChallengeComparison {
-  id: string;
-  name: string;
-  description?: string;
-  championWorkflowId: string;
-  challengeWorkflowId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: string;
-  totalExecutions: number;
-  completedExecutions: number;
-  runningExecutions: number;
-  failedExecutions: number;
-  lastExecutionAt?: Date;
-}
-
-// Detail: Individual execution under a comparison
-export interface ChampionChallengeExecution {
-  id: string;
-  comparisonId: string;  // Reference to comparison
-  name: string;  // From comparison
-  description?: string;  // From comparison
-  championWorkflowId: string;  // From comparison
-  challengeWorkflowId: string;  // From comparison
-  requestPayload: any;  // Execution-specific
-  status: 'running' | 'completed' | 'failed';
-  startedAt: Date;
-  completedAt?: Date;
-  createdAt: Date;
-  metrics: {
-    champion: NodeMetric[];
-    challenge: NodeMetric[];
-  };
-}
-
 export interface NodeMetric {
   id: string;
   executionId: string;
@@ -52,6 +16,23 @@ export interface NodeMetric {
     memoryUsed?: number;
     cpuUsage?: number;
     [key: string]: any;
+  };
+}
+
+export interface ChampionChallengeExecution {
+  id: string;
+  name: string;
+  description?: string;
+  championWorkflowId: string;
+  challengeWorkflowId: string;
+  requestPayload: any;
+  status: 'running' | 'completed' | 'failed';
+  startedAt: Date;
+  completedAt?: Date;
+  createdAt: Date;
+  metrics: {
+    champion: NodeMetric[];
+    challenge: NodeMetric[];
   };
 }
 
