@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ABTestMetrics, TimeFilter, ArmStatistics } from '../types/abtest';
-import { abTestApiService } from '../services/abTestApiService';
+import { abTestService } from '../services/abTestService';
 
 
 export function useMetrics(testId: string, timeFilter: TimeFilter) {
@@ -12,14 +12,12 @@ export function useMetrics(testId: string, timeFilter: TimeFilter) {
     const fetchMetrics = async () => {
       try {
         setLoading(true);
-        const response = await abTestApiService.getMetrics(testId, timeFilter.value);
-        if (response.success && response.data) {
-          setMetrics(response.data.metrics);
-        } else {
-          throw new Error(response.message || 'Failed to fetch metrics');
-        }
+        const data = await abTestService.getMetrics(testId, timeFilter.value);
+        setMetrics(data);
+        setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch metrics');
+        setMetrics(null);
       } finally {
         setLoading(false);
       }

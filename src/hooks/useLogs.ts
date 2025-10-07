@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ExecutionLog, ServiceStep, ActivityExecution } from '../types/abtest';
-import { abTestApiService } from '../services/abTestApiService';
+import { abTestService } from '../services/abTestService';
 
 export function useLogs(testId: string) {
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
@@ -11,14 +11,12 @@ export function useLogs(testId: string) {
     const fetchLogs = async () => {
       try {
         setLoading(true);
-        const response = await abTestApiService.getLogs(testId, 0, 200);
-        if (response.success && response.data) {
-          setLogs(response.data.logs);
-        } else {
-          throw new Error(response.message || 'Failed to fetch logs');
-        }
+        const data = await abTestService.getLogs(testId, 0, 200);
+        setLogs(data);
+        setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch logs');
+        setLogs([]);
       } finally {
         setLoading(false);
       }

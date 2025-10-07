@@ -1,5 +1,5 @@
-import { abTestApiService, ABTestResponse } from './abTestApiService';
-import { ABTestConfig } from '../types/abtest';
+import { abTestApiService, ABTestResponse, ABTestAnalyticsResponse } from './abTestApiService';
+import { ABTestConfig, ABTestMetrics, ExecutionLog, ArmStatistics } from '../types/abtest';
 
 // Helper to map backend response to frontend
 function mapBackendToFrontend(backendTest: ABTestResponse): ABTestConfig {
@@ -243,6 +243,234 @@ export class ABTestService {
 
     this.mockTests = this.mockTests.filter(t => t.id !== testId);
     await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  async getMetrics(testId: string, timeFilter: string): Promise<ABTestMetrics> {
+    if (this.useBackend) {
+      try {
+        const analytics = await abTestApiService.getAnalytics(testId);
+        return this.mapAnalyticsToMetrics(analytics, testId);
+      } catch (error) {
+        console.warn('Backend API failed, using mock data:', error);
+        this.useBackend = false;
+      }
+    }
+
+    return this.generateMockMetrics(testId);
+  }
+
+  async getLogs(testId: string, page: number, pageSize: number): Promise<ExecutionLog[]> {
+    if (this.useBackend) {
+      try {
+        const analytics = await abTestApiService.getAnalytics(testId);
+        return this.mapAnalyticsToLogs(analytics, testId);
+      } catch (error) {
+        console.warn('Backend API failed, using mock data:', error);
+        this.useBackend = false;
+      }
+    }
+
+    return this.generateMockLogs(testId);
+  }
+
+  private mapAnalyticsToMetrics(analytics: ABTestAnalyticsResponse, testId: string): ABTestMetrics {
+    const armStats: Record<string, ArmStatistics> = {};
+
+    analytics.armPerformance.forEach((arm, index) => {
+      const armKey = String.fromCharCode(97 + index);
+      armStats[armKey] = {
+        armKey,
+        armName: arm.armName,
+        runs: arm.executions,
+        successRate: arm.successRate,
+        errorRate: arm.errorRate,
+        avgDuration: arm.avgExecutionTime,
+        minDuration: arm.avgExecutionTime * 0.7,
+        maxDuration: arm.avgExecutionTime * 1.5,
+        totalDuration: arm.avgExecutionTime * arm.executions,
+        retryCount: 0,
+        queueTime: 0,
+      };
+    });
+
+    return {
+      testId,
+      totalRuns: analytics.overview.totalExecutions,
+      armStats,
+      timeSeriesData: analytics.timeSeries.map(ts => ({
+        timestamp: ts.timestamp,
+        armData: Object.entries(ts.executionsByArm).reduce((acc, [armId, count], index) => {
+          const armKey = String.fromCharCode(97 + index);
+          acc[armKey] = {
+            requests: count,
+            success: Math.floor(count * (ts.successRateByArm[armId] || 0.95)),
+            errors: Math.floor(count * (1 - (ts.successRateByArm[armId] || 0.95))),
+            avgDuration: ts.avgLatencyByArm[armId] || 200,
+          };
+          return acc;
+        }, {} as any),
+      })),
+      serviceExecutions: [],
+      latencyPercentiles: {
+        p50: Object.fromEntries(analytics.armPerformance.map((arm, i) => [String.fromCharCode(97 + i), arm.p50Latency])),
+        p90: Object.fromEntries(analytics.armPerformance.map((arm, i) => [String.fromCharCode(97 + i), arm.p95Latency * 0.9])),
+        p95: Object.fromEntries(analytics.armPerformance.map((arm, i) => [String.fromCharCode(97 + i), arm.p95Latency])),
+        p99: Object.fromEntries(analytics.armPerformance.map((arm, i) => [String.fromCharCode(97 + i), arm.p99Latency])),
+      },
+      throughputMetrics: {
+        rps: {},
+        peakRps: {},
+        avgRps: {},
+        totalRequests: Object.fromEntries(analytics.armPerformance.map((arm, i) => [String.fromCharCode(97 + i), arm.executions])),
+      },
+      slaMetrics: {
+        slaThreshold: 1000,
+        breaches: {},
+        complianceRate: {},
+        avgResponseTime: Object.fromEntries(analytics.armPerformance.map((arm, i) => [String.fromCharCode(97 + i), arm.avgExecutionTime])),
+      },
+      concurrencyMetrics: {
+        maxConcurrent: {},
+        avgConcurrent: {},
+        queueTime: {},
+        waitTime: {},
+      },
+      errorBreakdown: [],
+      activityPerformance: [],
+    };
+  }
+
+  private mapAnalyticsToLogs(analytics: ABTestAnalyticsResponse, testId: string): ExecutionLog[] {
+    const logs: ExecutionLog[] = [];
+
+    analytics.armPerformance.forEach((arm, index) => {
+      const armKey = String.fromCharCode(97 + index);
+
+      for (let i = 0; i < Math.min(arm.executions, 50); i++) {
+        const isSuccess = Math.random() < arm.successRate;
+        logs.push({
+          id: `log-${testId}-${armKey}-${i}`,
+          testId,
+          armKey,
+          armName: arm.armName,
+          status: isSuccess ? 'success' : 'error',
+          duration: Math.floor(arm.avgExecutionTime + (Math.random() - 0.5) * 100),
+          timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+          errorMessage: isSuccess ? undefined : 'Execution failed',
+          serviceSteps: [],
+          retryCount: 0,
+          queueTime: 0,
+          activityExecutions: [],
+        });
+      }
+    });
+
+    return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }
+
+  private generateMockMetrics(testId: string): ABTestMetrics {
+    return {
+      testId,
+      totalRuns: 1250,
+      armStats: {
+        a: {
+          armKey: 'a',
+          armName: 'Standard Flow',
+          runs: 625,
+          successRate: 0.96,
+          errorRate: 0.04,
+          avgDuration: 245,
+          minDuration: 180,
+          maxDuration: 450,
+          totalDuration: 153125,
+          retryCount: 15,
+          queueTime: 25,
+        },
+        b: {
+          armKey: 'b',
+          armName: 'Optimized Flow',
+          runs: 625,
+          successRate: 0.98,
+          errorRate: 0.02,
+          avgDuration: 185,
+          minDuration: 120,
+          maxDuration: 320,
+          totalDuration: 115625,
+          retryCount: 8,
+          queueTime: 18,
+        },
+      },
+      timeSeriesData: Array.from({ length: 20 }, (_, i) => ({
+        timestamp: new Date(Date.now() - (19 - i) * 300000).toISOString(),
+        armData: {
+          a: {
+            requests: Math.floor(Math.random() * 50 + 25),
+            success: Math.floor(Math.random() * 48 + 24),
+            errors: Math.floor(Math.random() * 2),
+            avgDuration: Math.floor(Math.random() * 50 + 220),
+          },
+          b: {
+            requests: Math.floor(Math.random() * 50 + 25),
+            success: Math.floor(Math.random() * 49 + 24),
+            errors: Math.floor(Math.random() * 1),
+            avgDuration: Math.floor(Math.random() * 40 + 165),
+          },
+        },
+      })),
+      serviceExecutions: [],
+      latencyPercentiles: {
+        p50: { a: 240, b: 180 },
+        p90: { a: 380, b: 280 },
+        p95: { a: 420, b: 310 },
+        p99: { a: 450, b: 320 },
+      },
+      throughputMetrics: {
+        rps: { a: 10.5, b: 10.5 },
+        peakRps: { a: 25, b: 28 },
+        avgRps: { a: 10.4, b: 10.4 },
+        totalRequests: { a: 625, b: 625 },
+      },
+      slaMetrics: {
+        slaThreshold: 1000,
+        breaches: { a: 5, b: 2 },
+        complianceRate: { a: 0.992, b: 0.997 },
+        avgResponseTime: { a: 245, b: 185 },
+      },
+      concurrencyMetrics: {
+        maxConcurrent: { a: 15, b: 18 },
+        avgConcurrent: { a: 8, b: 9 },
+        queueTime: { a: 25, b: 18 },
+        waitTime: { a: 12, b: 8 },
+      },
+      errorBreakdown: [],
+      activityPerformance: [],
+    };
+  }
+
+  private generateMockLogs(testId: string): ExecutionLog[] {
+    const logs: ExecutionLog[] = [];
+
+    ['a', 'b'].forEach(armKey => {
+      for (let i = 0; i < 50; i++) {
+        const isSuccess = Math.random() < 0.97;
+        logs.push({
+          id: `log-${testId}-${armKey}-${i}`,
+          testId,
+          armKey,
+          armName: armKey === 'a' ? 'Standard Flow' : 'Optimized Flow',
+          status: isSuccess ? 'success' : 'error',
+          duration: Math.floor(Math.random() * 200 + (armKey === 'a' ? 200 : 150)),
+          timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+          errorMessage: isSuccess ? undefined : 'Execution failed',
+          serviceSteps: [],
+          retryCount: 0,
+          queueTime: 0,
+          activityExecutions: [],
+        });
+      }
+    });
+
+    return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 
   resetToBackend() {

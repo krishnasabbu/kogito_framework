@@ -6,10 +6,8 @@ import { ExecutionList } from './ExecutionList';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Trophy, Plus } from 'lucide-react';
-import { mockChampionChallengeService } from '../../services/mockChampionChallengeService';
+import { championChallengeService } from '../../services/championChallengeService';
 import toast from 'react-hot-toast';
-
-const USE_MOCK_DATA = true;
 
 type View = 'list' | 'create' | 'dashboard';
 
@@ -20,13 +18,13 @@ export const ChampionChallengeApp: React.FC = () => {
   const { executions, addExecution, setCurrentExecution } = useChampionChallengeStore();
 
   useEffect(() => {
-                        ();
+    loadExecutions();
   }, []);
 
   const loadExecutions = async () => {
     setIsLoading(true);
     try {
-      const executionList = await mockChampionChallengeService.listExecutions();
+      const executionList = await championChallengeService.listExecutions();
       executionList.forEach(exec => addExecution(exec));
     } catch (error) {
       console.error('Failed to load executions:', error);
@@ -48,10 +46,14 @@ export const ChampionChallengeApp: React.FC = () => {
 
   const handleViewExecution = async (executionId: string) => {
     try {
-      const execution = await mockChampionChallengeService.getExecution(executionId);
-      setCurrentExecution(execution);
-      setSelectedExecutionId(executionId);
-      setCurrentView('dashboard');
+      const execution = await championChallengeService.loadExecution(executionId);
+      if (execution) {
+        setCurrentExecution(execution);
+        setSelectedExecutionId(executionId);
+        setCurrentView('dashboard');
+      } else {
+        throw new Error('Execution not found');
+      }
     } catch (error) {
       console.error('Failed to load execution:', error);
       toast.error('Failed to load execution details');
@@ -84,11 +86,6 @@ export const ChampionChallengeApp: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {USE_MOCK_DATA && (
-                <div className="px-3 py-1.5 bg-yellow-100 border border-yellow-400 rounded-lg text-yellow-800 text-xs font-semibold">
-                  DEMO MODE - Using Mock Data
-                </div>
-              )}
               {currentView !== 'list' && (
                 <Button
                   onClick={handleBackToList}
