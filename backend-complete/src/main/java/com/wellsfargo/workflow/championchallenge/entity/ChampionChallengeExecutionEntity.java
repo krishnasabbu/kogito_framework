@@ -19,17 +19,9 @@ public class ChampionChallengeExecutionEntity {
     @Column(name = "id", length = 36)
     private String id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
-    @Column(name = "champion_workflow_id", nullable = false)
-    private String championWorkflowId;
-
-    @Column(name = "challenge_workflow_id", nullable = false)
-    private String challengeWorkflowId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comparison_id", nullable = false)
+    private ComparisonEntity comparison;
 
     @Column(name = "request_payload", columnDefinition = "TEXT")
     private String requestPayload;
