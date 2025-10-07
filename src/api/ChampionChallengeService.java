@@ -25,10 +25,7 @@ import java.util.stream.Collectors;
 public class ChampionChallengeService {
 
     private final ChampionChallengeExecutionRepository executionRepository;
-    private final ExecutionNodeMetricsRepository metricsRepository;
-    private final ExecutionComparisonsRepository comparisonsRepository;
-    private final ExecutionFiltersRepository filtersRepository;
-    private final BpmnExecutionEngine bpmnEngine;
+             
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Transactional
