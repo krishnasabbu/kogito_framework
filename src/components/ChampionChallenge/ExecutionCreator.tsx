@@ -184,9 +184,9 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
           )}
         </div>
 
-        <Card className="p-4 bg-blue-50 border-blue-200">
-          <h4 className="font-semibold mb-2 text-blue-900">How it works:</h4>
-          <ul className="text-sm text-blue-800 space-y-1">
+        <Card className="p-4 bg-red-50 border-wells-red">
+          <h4 className="font-semibold mb-2 text-wells-red font-wells">How it works:</h4>
+          <ul className="text-sm text-gray-700 space-y-1">
             <li>• Both workflows execute simultaneously with identical input</li>
             <li>• Metrics are collected for every node in each workflow</li>
             <li>• Performance is compared side-by-side with detailed analysis</li>
@@ -198,7 +198,7 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
           <Button
             onClick={handleExecute}
             disabled={isExecuting}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            className="flex-1 bg-gradient-to-r from-wells-red to-wells-gold hover:from-wells-red-hover hover:to-wells-gold"
             size="lg"
           >
             {isExecuting ? (

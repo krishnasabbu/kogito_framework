@@ -44,6 +44,7 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
         id: nodeId,
         type: 'comparisonNode',
         position: { x: championX, y: startY + index * verticalSpacing },
+        draggable: true,
         data: {
           metric,
           variant: 'champion',
@@ -63,7 +64,7 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
           type: 'smoothstep',
           animated: metric.status === 'success',
           style: {
-            stroke: metric.status === 'error' ? '#ef4444' : '#3b82f6',
+            stroke: metric.status === 'error' ? '#ef4444' : '#C40404',
             strokeWidth: 2,
           },
         });
@@ -77,6 +78,7 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
         id: nodeId,
         type: 'comparisonNode',
         position: { x: challengeX, y: startY + index * verticalSpacing },
+        draggable: true,
         data: {
           metric,
           variant: 'challenge',
@@ -96,7 +98,7 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
           type: 'smoothstep',
           animated: metric.status === 'success',
           style: {
-            stroke: metric.status === 'error' ? '#ef4444' : '#9333ea',
+            stroke: metric.status === 'error' ? '#ef4444' : '#FFD700',
             strokeWidth: 2,
           },
         });
@@ -132,7 +134,8 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
     return { nodes, edges };
   }, [championMetrics, challengeMetrics, selectedNodeId, onNodeClick]);
 
-  const onNodesChange = useCallback(() => {}, []);
+  const onNodesChange = useCallback((changes: any) => {
+  }, []);
   const onEdgesChange = useCallback(() => {}, []);
 
   return (
@@ -141,12 +144,12 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
         <Card className="p-3 bg-white shadow-lg">
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-              <span className="font-medium">Champion</span>
+              <div className="w-3 h-3 rounded-full bg-wells-red"></div>
+              <span className="font-medium font-wells">Champion</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-600"></div>
-              <span className="font-medium">Challenge</span>
+              <div className="w-3 h-3 rounded-full bg-wells-gold"></div>
+              <span className="font-medium font-wells">Challenge</span>
             </div>
           </div>
         </Card>
@@ -175,6 +178,9 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         connectionLineType={ConnectionLineType.SmoothStep}
+        nodesDraggable={true}
+        nodesConnectable={false}
+        elementsSelectable={true}
         fitView
         minZoom={0.1}
         maxZoom={2}
@@ -184,7 +190,7 @@ export const ComparisonFlowCanvas: React.FC<ComparisonFlowCanvasProps> = ({
         <MiniMap
           nodeColor={(node) => {
             const variant = node.data?.variant;
-            return variant === 'champion' ? '#3b82f6' : '#9333ea';
+            return variant === 'champion' ? '#C40404' : '#FFD700';
           }}
           maskColor="rgba(0, 0, 0, 0.1)"
         />

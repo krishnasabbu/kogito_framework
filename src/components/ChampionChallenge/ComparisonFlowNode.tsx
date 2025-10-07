@@ -39,13 +39,13 @@ export const ComparisonFlowNode = memo(({ data }: NodeProps<ComparisonNodeData>)
     }
   };
 
-  const variantColor = variant === 'champion' ? 'bg-blue-600' : 'bg-purple-600';
+  const variantColor = variant === 'champion' ? 'bg-wells-red' : 'bg-wells-gold text-gray-900';
 
   return (
     <div
       className={`min-w-[200px] rounded-lg border-2 shadow-lg transition-all duration-200 cursor-pointer hover:shadow-xl ${
         getStatusColor()
-      } ${isHighlighted ? 'ring-4 ring-blue-400' : ''}`}
+      } ${isHighlighted ? 'ring-4 ring-wells-red' : ''}`}
       onClick={onClick}
     >
       <Handle type="target" position={Position.Top} className="w-3 h-3" />
