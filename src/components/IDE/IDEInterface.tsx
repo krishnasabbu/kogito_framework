@@ -502,7 +502,7 @@ export default function IDEInterface() {
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
                         }`}
-                        placeholder="http://localhost:8080"
+                        placeholder="http://localhost:8989"
                       />
                     </div>
                     

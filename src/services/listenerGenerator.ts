@@ -60,7 +60,7 @@ public class ${config.className} implements ExecutionListener, TaskListener {
     
     private static final Logger logger = LoggerFactory.getLogger(${config.className}.class);
     private static final String AB_TEST_ID = "${test.id}";
-    private static final String AB_TEST_API_BASE = "http://localhost:8080/api/ab-tests";
+    private static final String AB_TEST_API_BASE = "http://localhost:8989/api/v1/ab-tests";
     
     @Autowired
     private RestTemplate restTemplate;
