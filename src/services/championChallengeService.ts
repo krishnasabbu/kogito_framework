@@ -1,7 +1,7 @@
-import { championChallengeApiService, ExecutionResponse } from './championChallengeApiService';
-import type { ChampionChallengeExecution, NodeMetric } from '../types/championChallenge';
+import { championChallengeApiService, ComparisonResponse, ExecutionResponse } from './championChallengeApiService';
+import type { ChampionChallengeComparison, ChampionChallengeExecution, NodeMetric } from '../types/championChallenge';
 
-// Helper to safely parse JSON (handles both string and already-parsed objects)
+// Helper to safely parse JSON
 function safeParse(value: any): any {
   if (!value) return {};
   if (typeof value === 'string') {
@@ -14,8 +14,27 @@ function safeParse(value: any): any {
   return value;
 }
 
-// Helper function to convert API response to frontend format
-function mapApiToFrontend(apiResponse: ExecutionResponse): ChampionChallengeExecution {
+// Map API comparison to frontend
+function mapApiComparisonToFrontend(apiResponse: ComparisonResponse): ChampionChallengeComparison {
+  return {
+    id: apiResponse.id,
+    name: apiResponse.name,
+    description: apiResponse.description,
+    championWorkflowId: apiResponse.championWorkflowId,
+    challengeWorkflowId: apiResponse.challengeWorkflowId,
+    createdAt: new Date(apiResponse.createdAt),
+    updatedAt: new Date(apiResponse.updatedAt),
+    createdBy: apiResponse.createdBy,
+    totalExecutions: apiResponse.totalExecutions || 0,
+    completedExecutions: apiResponse.completedExecutions || 0,
+    runningExecutions: apiResponse.runningExecutions || 0,
+    failedExecutions: apiResponse.failedExecutions || 0,
+    lastExecutionAt: apiResponse.lastExecutionAt ? new Date(apiResponse.lastExecutionAt) : undefined,
+  };
+}
+
+// Map API execution to frontend
+function mapApiExecutionToFrontend(apiResponse: ExecutionResponse): ChampionChallengeExecution {
   const championMetrics: NodeMetric[] = apiResponse.championMetrics.map(metric => ({
     id: metric.id,
     executionId: apiResponse.id,
@@ -52,6 +71,7 @@ function mapApiToFrontend(apiResponse: ExecutionResponse): ChampionChallengeExec
 
   return {
     id: apiResponse.id,
+    comparisonId: apiResponse.id, // Will be set properly by backend
     name: apiResponse.name,
     description: apiResponse.description,
     championWorkflowId: apiResponse.championWorkflowId,
@@ -68,59 +88,78 @@ function mapApiToFrontend(apiResponse: ExecutionResponse): ChampionChallengeExec
   };
 }
 
-// Mock data generator matching API format
-function generateMockExecution(
-  name: string,
-  description: string,
-  championWorkflowId: string,
-  challengeWorkflowId: string
-): ChampionChallengeExecution {
-  const id = `mock-${Date.now()}`;
+// Generate mock comparisons
+function generateMockComparisons(): ChampionChallengeComparison[] {
+  return [
+    {
+      id: 'mock-comp-1',
+      name: 'Payment Flow v1 vs v2',
+      description: 'Testing new payment processing workflow',
+      championWorkflowId: 'payment-v1',
+      challengeWorkflowId: 'payment-v2',
+      createdAt: new Date(Date.now() - 172800000),
+      updatedAt: new Date(Date.now() - 3600000),
+      totalExecutions: 3,
+      completedExecutions: 2,
+      runningExecutions: 1,
+      failedExecutions: 0,
+      lastExecutionAt: new Date(Date.now() - 3600000),
+    },
+    {
+      id: 'mock-comp-2',
+      name: 'Order Fulfillment Optimization',
+      description: 'Comparing standard vs optimized order flow',
+      championWorkflowId: 'order-v1',
+      challengeWorkflowId: 'order-v2',
+      createdAt: new Date(Date.now() - 86400000),
+      updatedAt: new Date(Date.now() - 7200000),
+      totalExecutions: 5,
+      completedExecutions: 5,
+      runningExecutions: 0,
+      failedExecutions: 0,
+      lastExecutionAt: new Date(Date.now() - 7200000),
+    },
+  ];
+}
+
+// Generate mock execution
+function generateMockExecution(comparisonId: string, comparison: ChampionChallengeComparison): ChampionChallengeExecution {
+  const id = `mock-exec-${Date.now()}`;
   const nodes = [
     { id: 'start', name: 'StartEvent', type: 'Event' },
     { id: 'validate', name: 'ServiceTask_ValidateInput', type: 'ServiceTask' },
     { id: 'process', name: 'ServiceTask_ProcessData', type: 'ServiceTask' },
     { id: 'call', name: 'ServiceTask_CallAPI', type: 'ServiceTask' },
-    { id: 'gateway', name: 'Gateway_CheckCondition', type: 'Gateway' },
-    { id: 'handle', name: 'ServiceTask_HandleResult', type: 'ServiceTask' },
     { id: 'end', name: 'EndEvent', type: 'Event' },
   ];
 
   const generateMetrics = (variant: 'champion' | 'challenge'): NodeMetric[] => {
-    const baseMultiplier = variant === 'champion' ? 1 : 0.8;
-    return nodes.map((node, index) => {
-      const execTime = Math.floor((Math.random() * 200 + 100) * baseMultiplier);
-      const status = Math.random() > 0.95 ? 'error' : 'success';
-
-      return {
-        id: `${id}-${variant}-${index}`,
-        executionId: id,
-        variant,
-        nodeId: node.id,
-        nodeName: node.name,
-        nodeType: node.type,
-        requestData: { payload: 'test' },
-        responseData: { result: status === 'success' ? 'success' : 'error' },
-        executionTimeMs: execTime,
-        status: status as 'success' | 'error',
-        errorMessage: status === 'error' ? `Error in ${node.name}` : undefined,
-        startedAt: new Date(Date.now() - execTime),
-        completedAt: new Date(),
-        metadata: {
-          memoryUsed: 20 + Math.random() * 80,
-          cpuUsage: 10 + Math.random() * 80,
-        },
-      };
-    });
+    const baseMultiplier = variant === 'champion' ? 1 : 0.85;
+    return nodes.map((node, index) => ({
+      id: `${id}-${variant}-${index}`,
+      executionId: id,
+      variant,
+      nodeId: node.id,
+      nodeName: node.name,
+      nodeType: node.type,
+      requestData: { payload: 'test' },
+      responseData: { result: 'success' },
+      executionTimeMs: Math.floor((Math.random() * 200 + 100) * baseMultiplier),
+      status: 'success' as const,
+      startedAt: new Date(Date.now() - 5000),
+      completedAt: new Date(),
+      metadata: { memoryUsed: 20 + Math.random() * 80, cpuUsage: 10 + Math.random() * 80 },
+    }));
   };
 
   return {
     id,
-    name,
-    description,
-    championWorkflowId,
-    challengeWorkflowId,
-    requestPayload: {},
+    comparisonId,
+    name: comparison.name,
+    description: comparison.description,
+    championWorkflowId: comparison.championWorkflowId,
+    challengeWorkflowId: comparison.challengeWorkflowId,
+    requestPayload: { testData: 'example' },
     status: 'completed',
     startedAt: new Date(Date.now() - 5000),
     completedAt: new Date(),
@@ -132,88 +171,155 @@ function generateMockExecution(
   };
 }
 
-function generateMockExecutions(): ChampionChallengeExecution[] {
-  return [
-    generateMockExecution(
-      'Payment Flow Performance Test',
-      'Testing payment processing speed',
-      'payment-v1',
-      'payment-v2'
-    ),
-    generateMockExecution(
-      'Order Fulfillment Comparison',
-      'Comparing order workflows',
-      'order-v1',
-      'order-v2'
-    ),
-  ];
-}
-
 export class ChampionChallengeService {
   private useBackend: boolean = true;
-  private mockExecutions: ChampionChallengeExecution[] = generateMockExecutions();
+  private mockComparisons: ChampionChallengeComparison[] = generateMockComparisons();
+  private mockExecutions: Map<string, ChampionChallengeExecution[]> = new Map();
 
-  async executeComparison(
-    championWorkflowId: string,
-    challengeWorkflowId: string,
-    requestPayload: any,
+  // ========== COMPARISON METHODS (MASTER) ==========
+
+  async createComparison(
     name: string,
-    description?: string
-  ): Promise<ChampionChallengeExecution> {
+    description: string,
+    championWorkflowId: string,
+    challengeWorkflowId: string
+  ): Promise<ChampionChallengeComparison> {
     if (this.useBackend) {
       try {
-        const apiResponse = await championChallengeApiService.createExecution(
+        const response = await championChallengeApiService.createComparison({
           name,
-          description || '',
+          description,
           championWorkflowId,
           challengeWorkflowId,
-          requestPayload
-        );
-        return mapApiToFrontend(apiResponse);
+        });
+        return mapApiComparisonToFrontend(response);
       } catch (error) {
         console.warn('Backend API failed, using mock data:', error);
         this.useBackend = false;
       }
     }
 
-    const mockExecution = generateMockExecution(
+    const mockComparison: ChampionChallengeComparison = {
+      id: `mock-comp-${Date.now()}`,
       name,
-      description || '',
+      description,
       championWorkflowId,
-      challengeWorkflowId
-    );
-    this.mockExecutions.unshift(mockExecution);
+      challengeWorkflowId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      totalExecutions: 0,
+      completedExecutions: 0,
+      runningExecutions: 0,
+      failedExecutions: 0,
+    };
+    this.mockComparisons.unshift(mockComparison);
+    return mockComparison;
+  }
+
+  async listComparisons(): Promise<ChampionChallengeComparison[]> {
+    if (this.useBackend) {
+      try {
+        const responses = await championChallengeApiService.listComparisons();
+        return responses.map(mapApiComparisonToFrontend);
+      } catch (error) {
+        console.warn('Backend API failed, using mock data:', error);
+        this.useBackend = false;
+      }
+    }
+
+    return this.mockComparisons;
+  }
+
+  async getComparison(id: string): Promise<ChampionChallengeComparison | null> {
+    if (this.useBackend) {
+      try {
+        const response = await championChallengeApiService.getComparison(id);
+        return mapApiComparisonToFrontend(response);
+      } catch (error) {
+        console.warn('Backend API failed, using mock data:', error);
+        this.useBackend = false;
+      }
+    }
+
+    return this.mockComparisons.find(c => c.id === id) || null;
+  }
+
+  async deleteComparison(id: string): Promise<void> {
+    if (this.useBackend) {
+      try {
+        await championChallengeApiService.deleteComparison(id);
+        return;
+      } catch (error) {
+        console.warn('Backend API failed, using mock data:', error);
+        this.useBackend = false;
+      }
+    }
+
+    this.mockComparisons = this.mockComparisons.filter(c => c.id !== id);
+  }
+
+  // ========== EXECUTION METHODS (DETAIL) ==========
+
+  async executeComparison(
+    comparisonId: string,
+    requestPayload: any
+  ): Promise<ChampionChallengeExecution> {
+    if (this.useBackend) {
+      try {
+        const response = await championChallengeApiService.executeComparison(comparisonId, requestPayload);
+        return mapApiExecutionToFrontend(response);
+      } catch (error) {
+        console.warn('Backend API failed, using mock data:', error);
+        this.useBackend = false;
+      }
+    }
+
+    const comparison = this.mockComparisons.find(c => c.id === comparisonId);
+    if (!comparison) throw new Error('Comparison not found');
+
+    const mockExecution = generateMockExecution(comparisonId, comparison);
+    const executions = this.mockExecutions.get(comparisonId) || [];
+    executions.unshift(mockExecution);
+    this.mockExecutions.set(comparisonId, executions);
+
+    comparison.totalExecutions++;
+    comparison.completedExecutions++;
+    comparison.lastExecutionAt = new Date();
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     return mockExecution;
   }
 
-  async loadExecution(executionId: string): Promise<ChampionChallengeExecution | null> {
+  async listExecutions(comparisonId: string): Promise<ChampionChallengeExecution[]> {
     if (this.useBackend) {
       try {
-        const apiResponse = await championChallengeApiService.getExecution(executionId);
-        return mapApiToFrontend(apiResponse);
+        const responses = await championChallengeApiService.listExecutions(comparisonId);
+        return responses.map(mapApiExecutionToFrontend);
       } catch (error) {
         console.warn('Backend API failed, using mock data:', error);
         this.useBackend = false;
       }
     }
 
-    const mockExecution = this.mockExecutions.find(e => e.id === executionId);
-    return mockExecution || null;
+    return this.mockExecutions.get(comparisonId) || [];
   }
 
-  async listExecutions(): Promise<ChampionChallengeExecution[]> {
+  async getExecution(executionId: string): Promise<ChampionChallengeExecution | null> {
     if (this.useBackend) {
       try {
-        const apiResponses = await championChallengeApiService.listExecutions();
-        return apiResponses.map(mapApiToFrontend);
+        const response = await championChallengeApiService.getExecution(executionId);
+        return mapApiExecutionToFrontend(response);
       } catch (error) {
         console.warn('Backend API failed, using mock data:', error);
         this.useBackend = false;
       }
     }
 
-    return this.mockExecutions;
+    for (const executions of this.mockExecutions.values()) {
+      const found = executions.find(e => e.id === executionId);
+      if (found) return found;
+    }
+    return null;
   }
 
   resetToBackend() {

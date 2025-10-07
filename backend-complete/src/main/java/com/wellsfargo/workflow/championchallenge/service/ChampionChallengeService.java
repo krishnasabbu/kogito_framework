@@ -20,7 +20,8 @@ public class ChampionChallengeService {
 
     private final ChampionChallengeExecutionRepository executionRepository;
     private final ExecutionNodeMetricRepository metricRepository;
-    private final ExecutionComparisonRepository comparisonRepository;
+    private final ExecutionComparisonRepository executionComparisonRepository;
+    private final ComparisonRepository comparisonRepository;
     private final WorkflowExecutionService workflowExecutionService;
 
     private static final List<String> SAMPLE_NODES = Arrays.asList(
@@ -29,27 +30,91 @@ public class ChampionChallengeService {
             "EndEvent"
     );
 
+    // ========== COMPARISON METHODS (MASTER) ==========
+
     @Transactional
-    public ExecutionResponse createExecution(ExecutionRequest request, String userId) {
-        log.info("Creating execution: {}", request.getName());
+    public ComparisonResponse createComparison(ComparisonRequest request, String userId) {
+        log.info("Creating comparison: {}", request.getName());
+
+        ComparisonEntity comparison = new ComparisonEntity();
+        comparison.setName(request.getName());
+        comparison.setDescription(request.getDescription());
+        comparison.setChampionWorkflowId(request.getChampionWorkflowId());
+        comparison.setChallengeWorkflowId(request.getChallengeWorkflowId());
+        comparison.setCreatedBy(userId);
+
+        comparison = comparisonRepository.save(comparison);
+        return mapToComparisonResponse(comparison);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ComparisonResponse> listComparisons() {
+        log.info("Listing all comparisons");
+        List<ComparisonEntity> comparisons = comparisonRepository.findAllByOrderByCreatedAtDesc();
+
+        return comparisons.stream().map(comparison -> {
+            ComparisonResponse response = mapToComparisonResponse(comparison);
+            // Get execution stats
+            List<ChampionChallengeExecutionEntity> executions = comparison.getExecutions();
+            response.setTotalExecutions((long) executions.size());
+            response.setCompletedExecutions(executions.stream()
+                    .filter(e -> e.getStatus() == ChampionChallengeExecutionEntity.ExecutionStatus.COMPLETED)
+                    .count());
+            response.setRunningExecutions(executions.stream()
+                    .filter(e -> e.getStatus() == ChampionChallengeExecutionEntity.ExecutionStatus.RUNNING)
+                    .count());
+            response.setFailedExecutions(executions.stream()
+                    .filter(e -> e.getStatus() == ChampionChallengeExecutionEntity.ExecutionStatus.FAILED)
+                    .count());
+            response.setLastExecutionAt(executions.stream()
+                    .map(ChampionChallengeExecutionEntity::getCreatedAt)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null));
+            return response;
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ComparisonResponse getComparison(UUID id) {
+        log.info("Getting comparison: {}", id);
+        ComparisonEntity comparison = comparisonRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Comparison not found"));
+        return mapToComparisonResponse(comparison);
+    }
+
+    @Transactional
+    public void deleteComparison(UUID id) {
+        log.info("Deleting comparison: {}", id);
+        comparisonRepository.deleteById(id);
+    }
+
+    // ========== EXECUTION METHODS (DETAIL) ==========
+
+    @Transactional
+    public ExecutionResponse executeComparison(UUID comparisonId, String requestPayload, String userId) {
+        log.info("Executing comparison: {}", comparisonId);
+
+        ComparisonEntity comparison = comparisonRepository.findById(comparisonId)
+                .orElseThrow(() -> new RuntimeException("Comparison not found"));
 
         ChampionChallengeExecutionEntity execution = new ChampionChallengeExecutionEntity();
-        execution.setName(request.getName());
-        execution.setDescription(request.getDescription());
-        execution.setChampionWorkflowId(request.getChampionWorkflowId());
-        execution.setChallengeWorkflowId(request.getChallengeWorkflowId());
-        execution.setRequestPayload(request.getRequestPayload());
+        execution.setComparison(comparison);
+        execution.setRequestPayload(requestPayload);
         execution.setCreatedBy(userId);
         execution.setStatus(ChampionChallengeExecutionEntity.ExecutionStatus.RUNNING);
         execution.setStartedAt(LocalDateTime.now());
 
         execution = executionRepository.save(execution);
 
-        List<ExecutionNodeMetricEntity> championMetrics = executeWorkflow(execution, "CHAMPION", request.getChampionWorkflowId());
-        List<ExecutionNodeMetricEntity> challengeMetrics = executeWorkflow(execution, "CHALLENGE", request.getChallengeWorkflowId());
+        List<ExecutionNodeMetricEntity> championMetrics = executeWorkflow(
+                execution, "CHAMPION", comparison.getChampionWorkflowId());
+        List<ExecutionNodeMetricEntity> challengeMetrics = executeWorkflow(
+                execution, "CHALLENGE", comparison.getChallengeWorkflowId());
 
-        long championTotal = championMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
-        long challengeTotal = challengeMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
+        long championTotal = championMetrics.stream()
+                .mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
+        long challengeTotal = challengeMetrics.stream()
+                .mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
 
         execution.setTotalChampionTimeMs(championTotal);
         execution.setTotalChallengeTimeMs(challengeTotal);
@@ -58,13 +123,35 @@ public class ChampionChallengeService {
         execution.setCompletedAt(LocalDateTime.now());
 
         executionRepository.save(execution);
+        createExecutionComparisons(execution, championMetrics, challengeMetrics);
 
-        createComparisons(execution, championMetrics, challengeMetrics);
-
-        return mapToResponse(execution);
+        return mapToExecutionResponse(execution, comparison);
     }
 
-    private List<ExecutionNodeMetricEntity> executeWorkflow(ChampionChallengeExecutionEntity execution, String variant, String workflowId) {
+    @Transactional(readOnly = true)
+    public List<ExecutionResponse> listExecutions(UUID comparisonId) {
+        log.info("Listing executions for comparison: {}", comparisonId);
+        ComparisonEntity comparison = comparisonRepository.findById(comparisonId)
+                .orElseThrow(() -> new RuntimeException("Comparison not found"));
+
+        return comparison.getExecutions().stream()
+                .sorted(Comparator.comparing(ChampionChallengeExecutionEntity::getCreatedAt).reversed())
+                .map(exec -> mapToExecutionResponse(exec, comparison))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ExecutionResponse getExecution(String executionId) {
+        log.info("Getting execution: {}", executionId);
+        ChampionChallengeExecutionEntity execution = executionRepository.findByIdWithMetrics(executionId)
+                .orElseThrow(() -> new RuntimeException("Execution not found"));
+        return mapToExecutionResponse(execution, execution.getComparison());
+    }
+
+    // ========== HELPER METHODS ==========
+
+    private List<ExecutionNodeMetricEntity> executeWorkflow(
+            ChampionChallengeExecutionEntity execution, String variant, String workflowId) {
         List<ExecutionNodeMetricEntity> metrics = new ArrayList<>();
         boolean isChallenge = "CHALLENGE".equals(variant);
         Random random = new Random();
@@ -114,48 +201,36 @@ public class ChampionChallengeService {
         return metrics;
     }
 
-    private void createComparisons(ChampionChallengeExecutionEntity execution,
-                                   List<ExecutionNodeMetricEntity> championMetrics,
-                                   List<ExecutionNodeMetricEntity> challengeMetrics) {
-        long championTotal = championMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
-        long challengeTotal = challengeMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
+    private void createExecutionComparisons(ChampionChallengeExecutionEntity execution,
+                                           List<ExecutionNodeMetricEntity> championMetrics,
+                                           List<ExecutionNodeMetricEntity> challengeMetrics) {
+        long championTotal = championMetrics.stream()
+                .mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
+        long challengeTotal = challengeMetrics.stream()
+                .mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
 
-        createComparison(execution, "Total Execution Time", "PERFORMANCE",
-                        (double) championTotal, (double) challengeTotal, "ms");
+        createComparisonMetric(execution, "Total Execution Time", "PERFORMANCE",
+                (double) championTotal, (double) challengeTotal, "ms");
 
         double championAvg = championMetrics.isEmpty() ? 0 : championTotal / (double) championMetrics.size();
         double challengeAvg = challengeMetrics.isEmpty() ? 0 : challengeTotal / (double) challengeMetrics.size();
-        createComparison(execution, "Average Node Time", "PERFORMANCE",
-                        championAvg, challengeAvg, "ms");
+        createComparisonMetric(execution, "Average Node Time", "PERFORMANCE",
+                championAvg, challengeAvg, "ms");
 
-        long championSuccess = championMetrics.stream().filter(m -> "SUCCESS".equals(m.getStatus())).count();
-        long challengeSuccess = challengeMetrics.stream().filter(m -> "SUCCESS".equals(m.getStatus())).count();
-        double championSuccessRate = championMetrics.isEmpty() ? 0 : (championSuccess / (double) championMetrics.size()) * 100;
-        double challengeSuccessRate = challengeMetrics.isEmpty() ? 0 : (challengeSuccess / (double) challengeMetrics.size()) * 100;
-        createComparison(execution, "Success Rate", "QUALITY",
-                        championSuccessRate, challengeSuccessRate, "%");
-
-        double championAvgMemory = championMetrics.stream()
-                .mapToDouble(m -> m.getMemoryUsedMb() != null ? m.getMemoryUsedMb() : 0.0)
-                .average().orElse(0.0);
-        double challengeAvgMemory = challengeMetrics.stream()
-                .mapToDouble(m -> m.getMemoryUsedMb() != null ? m.getMemoryUsedMb() : 0.0)
-                .average().orElse(0.0);
-        createComparison(execution, "Average Memory Usage", "RESOURCE",
-                        championAvgMemory, challengeAvgMemory, "MB");
-
-        double championAvgCpu = championMetrics.stream()
-                .mapToDouble(m -> m.getCpuUsagePercent() != null ? m.getCpuUsagePercent() : 0.0)
-                .average().orElse(0.0);
-        double challengeAvgCpu = challengeMetrics.stream()
-                .mapToDouble(m -> m.getCpuUsagePercent() != null ? m.getCpuUsagePercent() : 0.0)
-                .average().orElse(0.0);
-        createComparison(execution, "Average CPU Usage", "RESOURCE",
-                        championAvgCpu, challengeAvgCpu, "%");
+        long championSuccess = championMetrics.stream()
+                .filter(m -> "SUCCESS".equals(m.getStatus())).count();
+        long challengeSuccess = challengeMetrics.stream()
+                .filter(m -> "SUCCESS".equals(m.getStatus())).count();
+        double championSuccessRate = championMetrics.isEmpty() ? 0 :
+                (championSuccess / (double) championMetrics.size()) * 100;
+        double challengeSuccessRate = challengeMetrics.isEmpty() ? 0 :
+                (challengeSuccess / (double) challengeMetrics.size()) * 100;
+        createComparisonMetric(execution, "Success Rate", "QUALITY",
+                championSuccessRate, challengeSuccessRate, "%");
     }
 
-    private void createComparison(ChampionChallengeExecutionEntity execution, String metricName,
-                                 String category, double championValue, double challengeValue, String unit) {
+    private void createComparisonMetric(ChampionChallengeExecutionEntity execution, String metricName,
+                                       String category, double championValue, double challengeValue, String unit) {
         double difference = challengeValue - championValue;
         double diffPercentage = championValue == 0 ? 0 : (difference / championValue) * 100;
 
@@ -179,130 +254,24 @@ public class ChampionChallengeService {
         comparison.setWinner(winner);
         comparison.setUnit(unit);
 
-        comparisonRepository.save(comparison);
+        executionComparisonRepository.save(comparison);
     }
 
-    @Transactional(readOnly = true)
-    public ExecutionResponse getExecution(String executionId) {
-        ChampionChallengeExecutionEntity execution = executionRepository.findByIdWithMetrics(executionId)
-                .orElseThrow(() -> new RuntimeException("Execution not found"));
-        return mapToResponse(execution);
+    private ComparisonResponse mapToComparisonResponse(ComparisonEntity comparison) {
+        ComparisonResponse response = new ComparisonResponse();
+        response.setId(comparison.getId().toString());
+        response.setName(comparison.getName());
+        response.setDescription(comparison.getDescription());
+        response.setChampionWorkflowId(comparison.getChampionWorkflowId());
+        response.setChallengeWorkflowId(comparison.getChallengeWorkflowId());
+        response.setCreatedAt(comparison.getCreatedAt());
+        response.setUpdatedAt(comparison.getUpdatedAt());
+        response.setCreatedBy(comparison.getCreatedBy());
+        return response;
     }
 
-    @Transactional(readOnly = true)
-    public List<ExecutionResponse> listExecutions() {
-        return executionRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public AnalyticsResponse getAnalytics(String executionId) {
-        ChampionChallengeExecutionEntity execution = executionRepository.findByIdWithMetrics(executionId)
-                .orElseThrow(() -> new RuntimeException("Execution not found"));
-
-        List<ExecutionNodeMetricEntity> championMetrics = execution.getNodeMetrics().stream()
-                .filter(m -> "CHAMPION".equals(m.getVariant()))
-                .sorted(Comparator.comparing(ExecutionNodeMetricEntity::getSequence))
-                .collect(Collectors.toList());
-
-        List<ExecutionNodeMetricEntity> challengeMetrics = execution.getNodeMetrics().stream()
-                .filter(m -> "CHALLENGE".equals(m.getVariant()))
-                .sorted(Comparator.comparing(ExecutionNodeMetricEntity::getSequence))
-                .collect(Collectors.toList());
-
-        double improvement = execution.getTotalChampionTimeMs() > 0
-                ? ((execution.getTotalChampionTimeMs() - execution.getTotalChallengeTimeMs()) /
-                (double) execution.getTotalChampionTimeMs()) * 100
-                : 0.0;
-
-        AnalyticsResponse.SummaryCards summaryCards = AnalyticsResponse.SummaryCards.builder()
-                .championTime(execution.getTotalChampionTimeMs())
-                .challengeTime(execution.getTotalChallengeTimeMs())
-                .winner(execution.getWinner())
-                .improvement(improvement)
-                .build();
-
-        List<AnalyticsResponse.ExecutionTimeData> executionTimeData = new ArrayList<>();
-        for (int i = 0; i < Math.min(championMetrics.size(), challengeMetrics.size()); i++) {
-            executionTimeData.add(AnalyticsResponse.ExecutionTimeData.builder()
-                    .node(championMetrics.get(i).getNodeName())
-                    .champion(championMetrics.get(i).getExecutionTimeMs())
-                    .challenge(challengeMetrics.get(i).getExecutionTimeMs())
-                    .build());
-        }
-
-        List<AnalyticsResponse.PieData> pieData = Arrays.asList(
-                AnalyticsResponse.PieData.builder().name("Champion").value(execution.getTotalChampionTimeMs()).build(),
-                AnalyticsResponse.PieData.builder().name("Challenge").value(execution.getTotalChallengeTimeMs()).build()
-        );
-
-        long champSuccess = championMetrics.stream().filter(m -> "SUCCESS".equals(m.getStatus())).count();
-        long challSuccess = challengeMetrics.stream().filter(m -> "SUCCESS".equals(m.getStatus())).count();
-
-        List<AnalyticsResponse.SuccessRateData> successRateData = Arrays.asList(
-                AnalyticsResponse.SuccessRateData.builder()
-                        .variant("Champion")
-                        .success(champSuccess)
-                        .error(championMetrics.size() - champSuccess)
-                        .build(),
-                AnalyticsResponse.SuccessRateData.builder()
-                        .variant("Challenge")
-                        .success(challSuccess)
-                        .error(challengeMetrics.size() - challSuccess)
-                        .build()
-        );
-
-        List<AnalyticsResponse.CumulativeData> cumulativeData = new ArrayList<>();
-        long champCumulative = 0L;
-        long challCumulative = 0L;
-        for (int i = 0; i < Math.min(championMetrics.size(), challengeMetrics.size()); i++) {
-            champCumulative += championMetrics.get(i).getExecutionTimeMs();
-            challCumulative += challengeMetrics.get(i).getExecutionTimeMs();
-            cumulativeData.add(AnalyticsResponse.CumulativeData.builder()
-                    .node(championMetrics.get(i).getNodeName())
-                    .championCumulative(champCumulative)
-                    .challengeCumulative(challCumulative)
-                    .build());
-        }
-
-        AnalyticsResponse.RadarData radarData = AnalyticsResponse.RadarData.builder()
-                .metrics(Arrays.asList("Speed", "Efficiency", "Reliability", "Performance", "Quality"))
-                .champion(Arrays.asList(85.0, 90.0, 95.0, 88.0, 92.0))
-                .challenge(Arrays.asList(90.0, 85.0, 90.0, 92.0, 88.0))
-                .build();
-
-        List<AnalyticsResponse.PerformanceComparison> performanceComparison = Arrays.asList(
-                AnalyticsResponse.PerformanceComparison.builder()
-                        .metric("Avg Time").championValue(championMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).average().orElse(0.0))
-                        .challengeValue(challengeMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).average().orElse(0.0)).build(),
-                AnalyticsResponse.PerformanceComparison.builder()
-                        .metric("Total Time").championValue(execution.getTotalChampionTimeMs().doubleValue())
-                        .challengeValue(execution.getTotalChallengeTimeMs().doubleValue()).build()
-        );
-
-        AnalyticsResponse.DetailedStatistics detailedStatistics = AnalyticsResponse.DetailedStatistics.builder()
-                .totalChampionNodes((long) championMetrics.size())
-                .totalChallengeNodes((long) challengeMetrics.size())
-                .championSuccess(champSuccess)
-                .challengeSuccess(challSuccess)
-                .championSuccessRate(championMetrics.size() > 0 ? (champSuccess / (double) championMetrics.size()) * 100 : 0.0)
-                .challengeSuccessRate(challengeMetrics.size() > 0 ? (challSuccess / (double) challengeMetrics.size()) * 100 : 0.0)
-                .build();
-
-        return AnalyticsResponse.builder()
-                .summaryCards(summaryCards)
-                .executionTimeData(executionTimeData)
-                .pieData(pieData)
-                .successRateData(successRateData)
-                .cumulativeData(cumulativeData)
-                .radarData(radarData)
-                .performanceComparison(performanceComparison)
-                .detailedStatistics(detailedStatistics)
-                .build();
-    }
-
-    private ExecutionResponse mapToResponse(ChampionChallengeExecutionEntity execution) {
+    private ExecutionResponse mapToExecutionResponse(ChampionChallengeExecutionEntity execution,
+                                                     ComparisonEntity comparison) {
         List<NodeMetricResponse> championMetrics = execution.getNodeMetrics().stream()
                 .filter(m -> "CHAMPION".equals(m.getVariant()))
                 .sorted(Comparator.comparing(ExecutionNodeMetricEntity::getSequence))
@@ -317,10 +286,10 @@ public class ChampionChallengeService {
 
         return ExecutionResponse.builder()
                 .id(execution.getId())
-                .name(execution.getName())
-                .description(execution.getDescription())
-                .championWorkflowId(execution.getChampionWorkflowId())
-                .challengeWorkflowId(execution.getChallengeWorkflowId())
+                .name(comparison.getName())
+                .description(comparison.getDescription())
+                .championWorkflowId(comparison.getChampionWorkflowId())
+                .challengeWorkflowId(comparison.getChallengeWorkflowId())
                 .requestPayload(execution.getRequestPayload())
                 .status(execution.getStatus().name())
                 .startedAt(execution.getStartedAt())

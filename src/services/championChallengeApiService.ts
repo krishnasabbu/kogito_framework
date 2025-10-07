@@ -1,13 +1,32 @@
 const BACKEND_BASE_URL = 'http://localhost:8989';
 
-interface ExecutionRequest {
+// ========== TYPE DEFINITIONS ==========
+
+// Comparison types (Master)
+interface ComparisonRequest {
   name: string;
   description?: string;
   championWorkflowId: string;
   challengeWorkflowId: string;
-  requestPayload?: string;
 }
 
+interface ComparisonResponse {
+  id: string;
+  name: string;
+  description: string;
+  championWorkflowId: string;
+  challengeWorkflowId: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  totalExecutions: number;
+  completedExecutions: number;
+  runningExecutions: number;
+  failedExecutions: number;
+  lastExecutionAt: string | null;
+}
+
+// Execution types (Detail)
 interface ExecutionResponse {
   id: string;
   name: string;
@@ -43,161 +62,103 @@ interface NodeMetricResponse {
   metadata: string;
 }
 
-interface AnalyticsResponse {
-  summaryCards: SummaryCards;
-  executionTimeData: ExecutionTimeData[];
-  pieData: PieData[];
-  successRateData: SuccessRateData[];
-  cumulativeData: CumulativeData[];
-  radarData: RadarData;
-  performanceComparison: PerformanceComparison[];
-  detailedStatistics: DetailedStatistics;
-}
+// ========== API SERVICE CLASS ==========
 
-interface SummaryCards {
-  championTime: number;
-  challengeTime: number;
-  winner: string;
-  improvement: number;
-}
-
-interface ExecutionTimeData {
-  node: string;
-  champion: number;
-  challenge: number;
-}
-
-interface PieData {
-  name: string;
-  value: number;
-}
-
-interface SuccessRateData {
-  variant: string;
-  success: number;
-  error: number;
-}
-
-interface CumulativeData {
-  node: string;
-  championCumulative: number;
-  challengeCumulative: number;
-}
-
-interface RadarData {
-  metrics: string[];
-  champion: number[];
-  challenge: number[];
-}
-
-interface PerformanceComparison {
-  metric: string;
-  championValue: number;
-  challengeValue: number;
-}
-
-interface DetailedStatistics {
-  totalChampionNodes: number;
-  totalChallengeNodes: number;
-  championSuccess: number;
-  challengeSuccess: number;
-  championSuccessRate: number;
-  challengeSuccessRate: number;
-}
-
-export class ChampionChallengeApiService {
+class ChampionChallengeApiService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = `${BACKEND_BASE_URL}/api/v2/champion-challenge/executions`;
+    this.baseUrl = `${BACKEND_BASE_URL}/api/v1/champion-challenge`;
   }
 
-  private async apiCall<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
-        ...options,
-      });
+  // ========== COMPARISON METHODS (MASTER) ==========
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
-      }
+  async createComparison(request: ComparisonRequest): Promise<ComparisonResponse> {
+    const response = await fetch(`${this.baseUrl}/comparisons`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
 
-      return await response.json();
-    } catch (error) {
-      console.error(`API call failed for ${endpoint}:`, error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to create comparison: ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+
+  async listComparisons(): Promise<ComparisonResponse[]> {
+    const response = await fetch(`${this.baseUrl}/comparisons`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to list comparisons: ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+
+  async getComparison(id: string): Promise<ComparisonResponse> {
+    const response = await fetch(`${this.baseUrl}/comparisons/${id}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to get comparison: ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+
+  async deleteComparison(id: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/comparisons/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete comparison: ${response.statusText}`);
     }
   }
 
-  async createExecution(
-    name: string,
-    description: string,
-    championWorkflowId: string,
-    challengeWorkflowId: string,
-    requestPayload: any = {}
-  ): Promise<ExecutionResponse> {
-    const request: ExecutionRequest = {
-      name,
-      description,
-      championWorkflowId,
-      challengeWorkflowId,
-      requestPayload: JSON.stringify(requestPayload),
-    };
+  // ========== EXECUTION METHODS (DETAIL) ==========
 
-    return this.apiCall<ExecutionResponse>('', {
+  async executeComparison(comparisonId: string, requestPayload: any): Promise<ExecutionResponse> {
+    const response = await fetch(`${this.baseUrl}/comparisons/${comparisonId}/execute`, {
       method: 'POST',
-      body: JSON.stringify(request),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestPayload),
     });
+
+    if (!response.ok) {
+      throw new Error(`Failed to execute comparison: ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+
+  async listExecutions(comparisonId: string): Promise<ExecutionResponse[]> {
+    const response = await fetch(`${this.baseUrl}/comparisons/${comparisonId}/executions`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to list executions: ${response.statusText}`);
+    }
+
+    return await response.json();
   }
 
   async getExecution(executionId: string): Promise<ExecutionResponse> {
-    return this.apiCall<ExecutionResponse>(`/${executionId}`, {
-      method: 'GET',
-    });
-  }
+    const response = await fetch(`${this.baseUrl}/executions/${executionId}`);
 
-  async listExecutions(): Promise<ExecutionResponse[]> {
-    return this.apiCall<ExecutionResponse[]>('', {
-      method: 'GET',
-    });
-  }
-
-  async getAnalytics(executionId: string): Promise<AnalyticsResponse> {
-    return this.apiCall<AnalyticsResponse>(`/${executionId}/analytics`, {
-      method: 'GET',
-    });
-  }
-
-  async healthCheck(): Promise<{ status: string }> {
-    try {
-      const response = await fetch(`${BACKEND_BASE_URL}/actuator/health`);
-      return await response.json();
-    } catch (error) {
-      return { status: 'DOWN' };
+    if (!response.ok) {
+      throw new Error(`Failed to get execution: ${response.statusText}`);
     }
+
+    return await response.json();
   }
 }
 
 export const championChallengeApiService = new ChampionChallengeApiService();
+
 export type {
-  ExecutionRequest,
+  ComparisonRequest,
+  ComparisonResponse,
   ExecutionResponse,
   NodeMetricResponse,
-  AnalyticsResponse,
-  SummaryCards,
-  ExecutionTimeData,
-  PieData,
-  SuccessRateData,
-  CumulativeData,
-  RadarData,
-  PerformanceComparison,
-  DetailedStatistics,
 };
