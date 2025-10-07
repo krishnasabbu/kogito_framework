@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useChampionChallengeStore } from '../../stores/championChallengeStore';
 import { ComparisonDashboard } from './ComparisonDashboard';
 import { ExecutionCreator } from './ExecutionCreator';
 import { ExecutionList } from './ExecutionList';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { Trophy, Plus, List } from 'lucide-react';
+import { Trophy, Plus } from 'lucide-react';
+import { championChallengeApiService } from '../../services/championChallengeApiService';
+import toast from 'react-hot-toast';
 
 type View = 'list' | 'create' | 'dashboard';
 
 export const ChampionChallengeApp: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('list');
-  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(
-    null
-  );
-  const { executions } = useChampionChallengeStore();
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { executions, addExecution, setCurrentExecution } = useChampionChallengeStore();
+
+  useEffect(() => {
+    loadExecutions();
+  }, []);
+
+  const loadExecutions = async () => {
+    setIsLoading(true);
+    try {
+      const executionList = await championChallengeApiService.listExecutions();
+      executionList.forEach(exec => addExecution(exec));
+    } catch (error) {
+      console.error('Failed to load executions:', error);
+      toast.error('Failed to load executions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCreateNew = () => {
     setCurrentView('create');
@@ -23,11 +41,19 @@ export const ChampionChallengeApp: React.FC = () => {
   const handleExecutionCreated = (executionId: string) => {
     setSelectedExecutionId(executionId);
     setCurrentView('dashboard');
+    loadExecutions();
   };
 
-  const handleViewExecution = (executionId: string) => {
-    setSelectedExecutionId(executionId);
-    setCurrentView('dashboard');
+  const handleViewExecution = async (executionId: string) => {
+    try {
+      const execution = await championChallengeApiService.getExecution(executionId);
+      setCurrentExecution(execution);
+      setSelectedExecutionId(executionId);
+      setCurrentView('dashboard');
+    } catch (error) {
+      console.error('Failed to load execution:', error);
+      toast.error('Failed to load execution details');
+    }
   };
 
   const handleBackToList = () => {
@@ -36,78 +62,89 @@ export const ChampionChallengeApp: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      <header className="bg-gradient-to-r from-wells-red to-wells-gold text-white shadow-lg">
+    <div className="h-full flex flex-col bg-light-bg dark:bg-dark-bg">
+      {/* Page Header */}
+      <div className="border-b border-light-border dark:border-dark-border bg-white dark:bg-dark-surface">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Trophy className="w-8 h-8" />
+              <div className="w-10 h-10 bg-gradient-to-r from-wells-red to-wells-gold rounded-xl flex items-center justify-center shadow-card">
+                <Trophy className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h1 className="text-2xl font-bold font-wells">Champion vs Challenge</h1>
-                <p className="text-sm opacity-90 font-wells">
+                <h1 className="text-2xl font-bold font-wells text-light-text-primary dark:text-dark-text-primary">
+                  Champion vs Challenge
+                </h1>
+                <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary font-wells">
                   Compare BPMN workflow executions side by side
                 </p>
               </div>
             </div>
 
-            {currentView !== 'list' && (
-              <Button
-                onClick={handleBackToList}
-                variant="outline"
-                className="bg-white text-blue-600 hover:bg-gray-100"
-              >
-                <List className="w-4 h-4 mr-2" />
-                Back to List
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1 overflow-hidden">
-        {currentView === 'list' && (
-          <div className="h-full overflow-auto p-6">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold">Execution History</h2>
-                  <p className="text-gray-600 mt-1">
-                    View and compare past champion vs challenge runs
-                  </p>
-                </div>
+            <div className="flex items-center gap-3">
+              {currentView !== 'list' && (
+                <Button
+                  onClick={handleBackToList}
+                  variant="outline"
+                  className="border-light-border dark:border-dark-border"
+                >
+                  Back to List
+                </Button>
+              )}
+              {currentView === 'list' && (
                 <Button
                   onClick={handleCreateNew}
-                  className="bg-gradient-to-r from-wells-red to-wells-gold hover:from-wells-red-hover hover:to-wells-gold"
+                  className="bg-gradient-to-r from-wells-red to-wells-gold hover:from-wells-red-hover hover:to-wells-gold text-white"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   New Comparison
                 </Button>
-              </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
-              {executions.length === 0 ? (
-                <Card className="p-12 text-center">
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        {currentView === 'list' && (
+          <div className="h-full overflow-auto p-6">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-wells-red mx-auto mb-4"></div>
+                  <p className="text-light-text-secondary dark:text-dark-text-secondary">
+                    Loading executions...
+                  </p>
+                </div>
+              </div>
+            ) : executions.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <Card className="p-12 text-center max-w-md">
                   <Trophy className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">
+                  <h3 className="text-xl font-semibold mb-2 text-light-text-primary dark:text-dark-text-primary">
                     No Comparisons Yet
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
                     Create your first champion vs challenge comparison to get started
                   </p>
                   <Button
                     onClick={handleCreateNew}
-                    className="bg-gradient-to-r from-wells-red to-wells-gold"
+                    className="bg-gradient-to-r from-wells-red to-wells-gold hover:from-wells-red-hover hover:to-wells-gold text-white"
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     Create Comparison
                   </Button>
                 </Card>
-              ) : (
+              </div>
+            ) : (
+              <div className="max-w-7xl mx-auto">
                 <ExecutionList
                   executions={executions}
                   onViewExecution={handleViewExecution}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -123,9 +160,11 @@ export const ChampionChallengeApp: React.FC = () => {
         )}
 
         {currentView === 'dashboard' && selectedExecutionId && (
-          <ComparisonDashboard executionId={selectedExecutionId} />
+          <div className="h-full">
+            <ComparisonDashboard executionId={selectedExecutionId} />
+          </div>
         )}
-      </main>
+      </div>
     </div>
   );
 };
