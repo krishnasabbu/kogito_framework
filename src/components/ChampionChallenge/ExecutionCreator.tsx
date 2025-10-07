@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { useChampionChallengeStore } from '../../stores/championChallengeStore';
-import { championChallengeApiService } from '../../services/championChallengeApiService';
+import { mockChampionChallengeService } from '../../services/mockChampionChallengeService';
 import { PlayCircle, Loader2, FileCode } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -55,7 +55,7 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
     const loadingToast = toast.loading('Executing champion vs challenge comparison...');
 
     try {
-      const execution = await championChallengeApiService.createExecution(
+      const execution = await mockChampionChallengeService.createExecution(
         name,
         description,
         championWorkflowId,
@@ -65,7 +65,12 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
 
       addExecution(execution);
       toast.dismiss(loadingToast);
-      toast.success('Comparison created successfully! Execution will complete shortly.');
+      toast.success('Comparison created successfully! Execution completing...');
+
+      setTimeout(() => {
+        toast.success('Execution completed! View results now.');
+      }, 2500);
+
       onExecutionCreated(execution.id);
     } catch (error: any) {
       toast.dismiss(loadingToast);
