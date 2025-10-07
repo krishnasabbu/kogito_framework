@@ -5,6 +5,7 @@ import { ComparisonSummaryPanel } from './ComparisonSummaryPanel';
 import { FilterPanel } from './FilterPanel';
 import { JsonFilterPanel } from './JsonFilterPanel';
 import { MetricDetailCard } from './MetricDetailCard';
+import { AnalyticsCharts } from './AnalyticsCharts';
 import { NodeMetric } from '../../types/championChallenge';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
@@ -17,6 +18,7 @@ import {
   X,
   Maximize2,
   Minimize2,
+  TrendingUp,
 } from 'lucide-react';
 
 interface ComparisonDashboardProps {
@@ -36,7 +38,7 @@ export const ComparisonDashboard: React.FC<ComparisonDashboardProps> = ({
 
   const [selectedMetric, setSelectedMetric] = useState<NodeMetric | null>(null);
   const [activeTab, setActiveTab] = useState<
-    'flow' | 'summary' | 'filters' | 'details'
+    'flow' | 'summary' | 'analytics' | 'details'
   >('flow');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFilterPanel, setShowFilterPanel] = useState(true);
@@ -152,6 +154,17 @@ export const ComparisonDashboard: React.FC<ComparisonDashboardProps> = ({
               Summary
             </button>
             <button
+              onClick={() => setActiveTab('analytics')}
+              className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors border-b-2 ${
+                activeTab === 'analytics'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <TrendingUp className="w-4 h-4" />
+              Analytics
+            </button>
+            <button
               onClick={() => setActiveTab('details')}
               className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors border-b-2 ${
                 activeTab === 'details'
@@ -233,6 +246,15 @@ export const ComparisonDashboard: React.FC<ComparisonDashboardProps> = ({
             {activeTab === 'summary' && summary && (
               <div className="p-6">
                 <ComparisonSummaryPanel summary={summary} />
+              </div>
+            )}
+
+            {activeTab === 'analytics' && (
+              <div className="h-full">
+                <AnalyticsCharts
+                  championMetrics={filteredMetrics.champion}
+                  challengeMetrics={filteredMetrics.challenge}
+                />
               </div>
             )}
 
