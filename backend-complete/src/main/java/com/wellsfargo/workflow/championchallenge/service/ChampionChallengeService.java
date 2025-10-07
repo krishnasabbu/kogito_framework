@@ -20,6 +20,7 @@ public class ChampionChallengeService {
 
     private final ChampionChallengeExecutionRepository executionRepository;
     private final ExecutionNodeMetricRepository metricRepository;
+    private final ExecutionComparisonRepository comparisonRepository;
     private final WorkflowExecutionService workflowExecutionService;
 
     private static final List<String> SAMPLE_NODES = Arrays.asList(
@@ -44,8 +45,11 @@ public class ChampionChallengeService {
 
         execution = executionRepository.save(execution);
 
-        long championTotal = executeWorkflow(execution, "CHAMPION", request.getChampionWorkflowId());
-        long challengeTotal = executeWorkflow(execution, "CHALLENGE", request.getChallengeWorkflowId());
+        List<ExecutionNodeMetricEntity> championMetrics = executeWorkflow(execution, "CHAMPION", request.getChampionWorkflowId());
+        List<ExecutionNodeMetricEntity> challengeMetrics = executeWorkflow(execution, "CHALLENGE", request.getChallengeWorkflowId());
+
+        long championTotal = championMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
+        long challengeTotal = challengeMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
 
         execution.setTotalChampionTimeMs(championTotal);
         execution.setTotalChallengeTimeMs(challengeTotal);
@@ -55,14 +59,18 @@ public class ChampionChallengeService {
 
         executionRepository.save(execution);
 
+        createComparisons(execution, championMetrics, challengeMetrics);
+
         return mapToResponse(execution);
     }
 
-    private long executeWorkflow(ChampionChallengeExecutionEntity execution, String variant, String workflowId) {
-        long totalTime = 0L;
+    private List<ExecutionNodeMetricEntity> executeWorkflow(ChampionChallengeExecutionEntity execution, String variant, String workflowId) {
+        List<ExecutionNodeMetricEntity> metrics = new ArrayList<>();
         boolean isChallenge = "CHALLENGE".equals(variant);
+        Random random = new Random();
 
-        for (String nodeName : SAMPLE_NODES) {
+        for (int i = 0; i < SAMPLE_NODES.size(); i++) {
+            String nodeName = SAMPLE_NODES.get(i);
             LocalDateTime start = LocalDateTime.now();
             long execTime;
             String status = "SUCCESS";
@@ -83,19 +91,95 @@ public class ChampionChallengeService {
             metric.setNodeName(nodeName);
             metric.setNodeType(nodeName.contains("Task") ? "ServiceTask" :
                     nodeName.contains("Gateway") ? "Gateway" : "Event");
+            metric.setSequence(i);
             metric.setExecutionTimeMs(execTime);
             metric.setStatus(status);
             metric.setErrorMessage(errorMessage);
             metric.setStartedAt(start);
             metric.setCompletedAt(LocalDateTime.now());
+            metric.setMemoryUsedMb(20.0 + random.nextDouble() * 80.0);
+            metric.setCpuUsagePercent(10.0 + random.nextDouble() * 80.0);
+            metric.setRequestData("{\"payload\":\"test\"}");
+            metric.setResponseData("{\"result\":\"success\"}");
 
             execution.addNodeMetric(metric);
             metricRepository.save(metric);
+            metrics.add(metric);
 
-            totalTime += execTime;
+            if ("ERROR".equals(status)) {
+                break;
+            }
         }
 
-        return totalTime;
+        return metrics;
+    }
+
+    private void createComparisons(ChampionChallengeExecutionEntity execution,
+                                   List<ExecutionNodeMetricEntity> championMetrics,
+                                   List<ExecutionNodeMetricEntity> challengeMetrics) {
+        long championTotal = championMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
+        long challengeTotal = challengeMetrics.stream().mapToLong(ExecutionNodeMetricEntity::getExecutionTimeMs).sum();
+
+        createComparison(execution, "Total Execution Time", "PERFORMANCE",
+                        (double) championTotal, (double) challengeTotal, "ms");
+
+        double championAvg = championMetrics.isEmpty() ? 0 : championTotal / (double) championMetrics.size();
+        double challengeAvg = challengeMetrics.isEmpty() ? 0 : challengeTotal / (double) challengeMetrics.size();
+        createComparison(execution, "Average Node Time", "PERFORMANCE",
+                        championAvg, challengeAvg, "ms");
+
+        long championSuccess = championMetrics.stream().filter(m -> "SUCCESS".equals(m.getStatus())).count();
+        long challengeSuccess = challengeMetrics.stream().filter(m -> "SUCCESS".equals(m.getStatus())).count();
+        double championSuccessRate = championMetrics.isEmpty() ? 0 : (championSuccess / (double) championMetrics.size()) * 100;
+        double challengeSuccessRate = challengeMetrics.isEmpty() ? 0 : (challengeSuccess / (double) challengeMetrics.size()) * 100;
+        createComparison(execution, "Success Rate", "QUALITY",
+                        championSuccessRate, challengeSuccessRate, "%");
+
+        double championAvgMemory = championMetrics.stream()
+                .mapToDouble(m -> m.getMemoryUsedMb() != null ? m.getMemoryUsedMb() : 0.0)
+                .average().orElse(0.0);
+        double challengeAvgMemory = challengeMetrics.stream()
+                .mapToDouble(m -> m.getMemoryUsedMb() != null ? m.getMemoryUsedMb() : 0.0)
+                .average().orElse(0.0);
+        createComparison(execution, "Average Memory Usage", "RESOURCE",
+                        championAvgMemory, challengeAvgMemory, "MB");
+
+        double championAvgCpu = championMetrics.stream()
+                .mapToDouble(m -> m.getCpuUsagePercent() != null ? m.getCpuUsagePercent() : 0.0)
+                .average().orElse(0.0);
+        double challengeAvgCpu = challengeMetrics.stream()
+                .mapToDouble(m -> m.getCpuUsagePercent() != null ? m.getCpuUsagePercent() : 0.0)
+                .average().orElse(0.0);
+        createComparison(execution, "Average CPU Usage", "RESOURCE",
+                        championAvgCpu, challengeAvgCpu, "%");
+    }
+
+    private void createComparison(ChampionChallengeExecutionEntity execution, String metricName,
+                                 String category, double championValue, double challengeValue, String unit) {
+        double difference = challengeValue - championValue;
+        double diffPercentage = championValue == 0 ? 0 : (difference / championValue) * 100;
+
+        String winner;
+        if ("QUALITY".equals(category)) {
+            winner = championValue > challengeValue ? "CHAMPION" :
+                    challengeValue > championValue ? "CHALLENGE" : "TIE";
+        } else {
+            winner = championValue < challengeValue ? "CHAMPION" :
+                    challengeValue < championValue ? "CHALLENGE" : "TIE";
+        }
+
+        ExecutionComparisonEntity comparison = new ExecutionComparisonEntity();
+        comparison.setExecution(execution);
+        comparison.setMetricName(metricName);
+        comparison.setMetricCategory(category);
+        comparison.setChampionValue(championValue);
+        comparison.setChallengeValue(challengeValue);
+        comparison.setDifference(difference);
+        comparison.setDifferencePercentage(diffPercentage);
+        comparison.setWinner(winner);
+        comparison.setUnit(unit);
+
+        comparisonRepository.save(comparison);
     }
 
     @Transactional(readOnly = true)
@@ -119,10 +203,12 @@ public class ChampionChallengeService {
 
         List<ExecutionNodeMetricEntity> championMetrics = execution.getNodeMetrics().stream()
                 .filter(m -> "CHAMPION".equals(m.getVariant()))
+                .sorted(Comparator.comparing(ExecutionNodeMetricEntity::getSequence))
                 .collect(Collectors.toList());
 
         List<ExecutionNodeMetricEntity> challengeMetrics = execution.getNodeMetrics().stream()
                 .filter(m -> "CHALLENGE".equals(m.getVariant()))
+                .sorted(Comparator.comparing(ExecutionNodeMetricEntity::getSequence))
                 .collect(Collectors.toList());
 
         double improvement = execution.getTotalChampionTimeMs() > 0
@@ -138,7 +224,7 @@ public class ChampionChallengeService {
                 .build();
 
         List<AnalyticsResponse.ExecutionTimeData> executionTimeData = new ArrayList<>();
-        for (int i = 0; i < championMetrics.size() && i < challengeMetrics.size(); i++) {
+        for (int i = 0; i < Math.min(championMetrics.size(), challengeMetrics.size()); i++) {
             executionTimeData.add(AnalyticsResponse.ExecutionTimeData.builder()
                     .node(championMetrics.get(i).getNodeName())
                     .champion(championMetrics.get(i).getExecutionTimeMs())
@@ -170,7 +256,7 @@ public class ChampionChallengeService {
         List<AnalyticsResponse.CumulativeData> cumulativeData = new ArrayList<>();
         long champCumulative = 0L;
         long challCumulative = 0L;
-        for (int i = 0; i < championMetrics.size() && i < challengeMetrics.size(); i++) {
+        for (int i = 0; i < Math.min(championMetrics.size(), challengeMetrics.size()); i++) {
             champCumulative += championMetrics.get(i).getExecutionTimeMs();
             challCumulative += challengeMetrics.get(i).getExecutionTimeMs();
             cumulativeData.add(AnalyticsResponse.CumulativeData.builder()
@@ -219,11 +305,13 @@ public class ChampionChallengeService {
     private ExecutionResponse mapToResponse(ChampionChallengeExecutionEntity execution) {
         List<NodeMetricResponse> championMetrics = execution.getNodeMetrics().stream()
                 .filter(m -> "CHAMPION".equals(m.getVariant()))
+                .sorted(Comparator.comparing(ExecutionNodeMetricEntity::getSequence))
                 .map(this::mapMetricToResponse)
                 .collect(Collectors.toList());
 
         List<NodeMetricResponse> challengeMetrics = execution.getNodeMetrics().stream()
                 .filter(m -> "CHALLENGE".equals(m.getVariant()))
+                .sorted(Comparator.comparing(ExecutionNodeMetricEntity::getSequence))
                 .map(this::mapMetricToResponse)
                 .collect(Collectors.toList());
 

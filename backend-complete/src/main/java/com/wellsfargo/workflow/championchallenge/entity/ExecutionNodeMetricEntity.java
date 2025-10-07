@@ -34,6 +34,9 @@ public class ExecutionNodeMetricEntity {
     @Column(name = "node_type", nullable = false, length = 100)
     private String nodeType;
 
+    @Column(name = "sequence", nullable = false)
+    private Integer sequence;
+
     @Column(name = "request_data", columnDefinition = "TEXT")
     private String requestData;
 
@@ -54,6 +57,12 @@ public class ExecutionNodeMetricEntity {
 
     @Column(name = "completed_at", nullable = false)
     private LocalDateTime completedAt;
+
+    @Column(name = "memory_used_mb")
+    private Double memoryUsedMb;
+
+    @Column(name = "cpu_usage_percent")
+    private Double cpuUsagePercent;
 
     @Column(name = "metadata", columnDefinition = "TEXT")
     private String metadata;

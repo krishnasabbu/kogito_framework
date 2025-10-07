@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS execution_node_metrics (
     node_id VARCHAR(255) NOT NULL,
     node_name VARCHAR(255) NOT NULL,
     node_type VARCHAR(100) NOT NULL,
+    sequence INT NOT NULL,
     request_data TEXT,
     response_data TEXT,
     execution_time_ms BIGINT NOT NULL,
@@ -92,7 +93,24 @@ CREATE TABLE IF NOT EXISTS execution_node_metrics (
     error_message TEXT,
     started_at TIMESTAMP NOT NULL,
     completed_at TIMESTAMP NOT NULL,
+    memory_used_mb DOUBLE DEFAULT 0.0,
+    cpu_usage_percent DOUBLE DEFAULT 0.0,
     metadata TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (execution_id) REFERENCES champion_challenge_executions(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS execution_comparisons (
+    id VARCHAR(36) PRIMARY KEY,
+    execution_id VARCHAR(36) NOT NULL,
+    metric_name VARCHAR(255) NOT NULL,
+    metric_category VARCHAR(100) NOT NULL,
+    champion_value DOUBLE NOT NULL,
+    challenge_value DOUBLE NOT NULL,
+    difference DOUBLE NOT NULL,
+    difference_percentage DOUBLE NOT NULL,
+    winner VARCHAR(50) NOT NULL,
+    unit VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (execution_id) REFERENCES champion_challenge_executions(id) ON DELETE CASCADE
 );
@@ -103,3 +121,5 @@ CREATE INDEX IF NOT EXISTS idx_ab_test_arms_test_id ON ab_test_arms(ab_test_id);
 CREATE INDEX IF NOT EXISTS idx_ab_test_executions_test_id ON ab_test_executions(ab_test_id);
 CREATE INDEX IF NOT EXISTS idx_cc_executions_status ON champion_challenge_executions(status);
 CREATE INDEX IF NOT EXISTS idx_node_metrics_execution_id ON execution_node_metrics(execution_id);
+CREATE INDEX IF NOT EXISTS idx_node_metrics_sequence ON execution_node_metrics(execution_id, sequence);
+CREATE INDEX IF NOT EXISTS idx_comparisons_execution_id ON execution_comparisons(execution_id);
