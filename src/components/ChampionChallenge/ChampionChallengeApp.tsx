@@ -20,7 +20,7 @@ export const ChampionChallengeApp: React.FC = () => {
   const { executions, addExecution, setCurrentExecution } = useChampionChallengeStore();
 
   useEffect(() => {
-    loadExecutions();
+                        ();
   }, []);
 
   const loadExecutions = async () => {
