@@ -72,3 +72,100 @@ export interface ComparisonFilter {
   };
   jsonFilters: JsonFilter[];
 }
+
+export interface ComparisonMaster {
+  id: string;
+  name: string;
+  description?: string;
+  workflowPair: string;
+  championWorkflowId: string;
+  challengeWorkflowId: string;
+  status: 'PENDING' | 'ANALYZING' | 'COMPLETED' | 'FAILED';
+  totalExecutions: number;
+  includedExecutions: number;
+  outlierCount: number;
+  aggregateMetrics?: AggregateMetrics;
+  statisticalAnalysis?: StatisticalAnalysis;
+  createdAt: Date;
+  completedAt?: Date;
+  createdBy?: string;
+}
+
+export interface ExecutionMapping {
+  id: string;
+  comparisonId: string;
+  executionId: string;
+  included: boolean;
+  outlierFlag: boolean;
+  outlierReason?: string;
+  outlierScore?: number;
+  executionOrder: number;
+  createdAt: Date;
+}
+
+export interface AggregateMetrics {
+  totalExecutions: number;
+  includedExecutions: number;
+  outlierCount: number;
+
+  performance: {
+    championAvgTime: number;
+    championMedianTime: number;
+    championP95: number;
+    challengeAvgTime: number;
+    challengeMedianTime: number;
+    challengeP95: number;
+    improvement: number;
+    consistency: {
+      championStdDev: number;
+      challengeStdDev: number;
+    };
+  };
+
+  reliability: {
+    championSuccessRate: number;
+    challengeSuccessRate: number;
+    championErrorCount: number;
+    challengeErrorCount: number;
+  };
+
+  winnerDistribution: {
+    championWins: number;
+    challengeWins: number;
+    ties: number;
+    winRate: number;
+  };
+
+  nodeAggregates: NodeAggregate[];
+  timeSeries: TimeSeriesPoint[];
+}
+
+export interface StatisticalAnalysis {
+  sampleSize: number;
+  confidenceLevel: number;
+  pValue: number;
+  isSignificant: boolean;
+  recommendation: string;
+  testMethod: string;
+}
+
+export interface NodeAggregate {
+  nodeId: string;
+  nodeName: string;
+  championAvgTime: number;
+  challengeAvgTime: number;
+  executionCount: number;
+  improvement: number;
+  winner: 'champion' | 'challenge' | 'tie';
+}
+
+export interface TimeSeriesPoint {
+  timestamp: string;
+  championAvg: number;
+  challengeAvg: number;
+  count: number;
+  championMin?: number;
+  championMax?: number;
+  challengeMin?: number;
+  challengeMax?: number;
+}
