@@ -3,15 +3,18 @@ import { useChampionChallengeStore } from '../../stores/championChallengeStore';
 import { ComparisonDashboard } from './ComparisonDashboard';
 import { ExecutionCreator } from './ExecutionCreator';
 import { ExecutionList } from './ExecutionList';
+import { CompareAllApp } from './CompareAllApp';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { Trophy, Plus } from 'lucide-react';
+import { Trophy, Plus, BarChart3 } from 'lucide-react';
 import { championChallengeService } from '../../services/championChallengeService';
 import toast from 'react-hot-toast';
 
 type View = 'list' | 'create' | 'dashboard';
+type Tab = 'individual' | 'compareAll';
 
 export const ChampionChallengeApp: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<Tab>('individual');
   const [currentView, setCurrentView] = useState<View>('list');
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,37 +83,75 @@ export const ChampionChallengeApp: React.FC = () => {
                   Champion vs Challenge
                 </h1>
                 <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary font-wells">
-                  Compare BPMN workflow executions side by side
+                  Compare BPMN workflow executions
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              {currentView !== 'list' && (
-                <Button
-                  onClick={handleBackToList}
-                  variant="outline"
-                  className="border-light-border dark:border-dark-border"
-                >
-                  Back to List
-                </Button>
-              )}
-              {currentView === 'list' && (
-                <Button
-                  onClick={handleCreateNew}
-                  className="bg-gradient-to-r from-wells-red to-wells-gold hover:from-wells-red-hover hover:to-wells-gold text-white"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  New Comparison
-                </Button>
-              )}
-            </div>
+            {activeTab === 'individual' && (
+              <div className="flex items-center gap-3">
+                {currentView !== 'list' && (
+                  <Button
+                    onClick={handleBackToList}
+                    variant="outline"
+                    className="border-light-border dark:border-dark-border"
+                  >
+                    Back to List
+                  </Button>
+                )}
+                {currentView === 'list' && (
+                  <Button
+                    onClick={handleCreateNew}
+                    className="bg-gradient-to-r from-wells-red to-wells-gold hover:from-wells-red-hover hover:to-wells-gold text-white"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    New Comparison
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="border-b border-light-border dark:border-dark-border px-6">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab('individual')}
+              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+                activeTab === 'individual'
+                  ? 'border-wells-red text-wells-red'
+                  : 'border-transparent text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Trophy className="w-4 h-4" />
+                Individual Comparison
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('compareAll')}
+              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+                activeTab === 'compareAll'
+                  ? 'border-purple-600 text-purple-600'
+                  : 'border-transparent text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                Compare All
+              </div>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
+        {activeTab === 'compareAll' ? (
+          <CompareAllApp />
+        ) : (
+          <>
         {currentView === 'list' && (
           <div className="h-full overflow-auto p-6">
             {isLoading ? (
@@ -167,6 +208,8 @@ export const ChampionChallengeApp: React.FC = () => {
           <div className="h-full">
             <ComparisonDashboard executionId={selectedExecutionId} />
           </div>
+        )}
+          </>
         )}
       </div>
     </div>
