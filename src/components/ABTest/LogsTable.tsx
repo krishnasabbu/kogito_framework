@@ -13,101 +13,14 @@ interface LogsTableProps {
   testId: string;
 }
 
-interface ServiceStep {
-  id: string;
-  serviceName: string;
-  method: string;
-  url: string;
-  status: 'success' | 'error';
-  duration: number;
-  request: any;
-  response: any;
-  timestamp: string;
-}
-
-interface DetailedLog extends ExecutionLog {
-  serviceSteps: ServiceStep[];
-}
-
-// Generate mock detailed logs with service steps
-const generateDetailedLogs = (logs: ExecutionLog[]): DetailedLog[] => {
-  return logs.map(log => ({
-    ...log,
-    serviceSteps: [
-      {
-        id: `${log.id}-step-1`,
-        serviceName: 'User Validation Service',
-        method: 'POST',
-        url: 'https://api.example.com/validate-user',
-        status: 'success',
-        duration: Math.floor(Math.random() * 200) + 50,
-        request: {
-          userId: 'user-123',
-          email: 'user@example.com',
-          timestamp: log.timestamp
-        },
-        response: {
-          valid: true,
-          userId: 'user-123',
-          tier: 'premium'
-        },
-        timestamp: log.timestamp
-      },
-      {
-        id: `${log.id}-step-2`,
-        serviceName: 'Payment Processing Service',
-        method: 'POST',
-        url: 'https://api.example.com/process-payment',
-        status: log.status,
-        duration: Math.floor(Math.random() * 500) + 100,
-        request: {
-          amount: 99.99,
-          currency: 'USD',
-          userId: 'user-123',
-          paymentMethod: 'credit_card'
-        },
-        response: log.status === 'success' ? {
-          transactionId: 'txn-789',
-          status: 'completed',
-          amount: 99.99
-        } : {
-          error: 'Payment failed',
-          code: 'INSUFFICIENT_FUNDS'
-        },
-        timestamp: new Date(new Date(log.timestamp).getTime() + 200).toISOString()
-      },
-      {
-        id: `${log.id}-step-3`,
-        serviceName: 'Notification Service',
-        method: 'POST',
-        url: 'https://api.example.com/send-notification',
-        status: 'success',
-        duration: Math.floor(Math.random() * 100) + 30,
-        request: {
-          userId: 'user-123',
-          type: 'payment_confirmation',
-          channel: 'email'
-        },
-        response: {
-          messageId: 'msg-456',
-          sent: true
-        },
-        timestamp: new Date(new Date(log.timestamp).getTime() + 700).toISOString()
-      }
-    ]
-  }));
-};
-
 export default function LogsTable({ logs, title, testId }: LogsTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [optionFilter, setOptionFilter] = useState<string>('all');
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
-  const [selectedLog, setSelectedLog] = useState<DetailedLog | null>(null);
+  const [selectedLog, setSelectedLog] = useState<ExecutionLog | null>(null);
 
-  const detailedLogs = generateDetailedLogs(logs);
-
-  const filteredLogs = detailedLogs.filter(log => {
+  const filteredLogs = logs.filter(log => {
     const matchesSearch = log.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          log.serviceName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
@@ -286,73 +199,45 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
                         </td>
                       </motion.tr>
                       
-                      {/* Expanded Service Steps */}
+                      {/* Expanded Log Details */}
                       {expandedLogs.has(log.id) && (
                         <tr>
                           <td colSpan={7} className="px-6 pb-6">
                             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 ml-8 border border-gray-200 dark:border-gray-700 shadow-inner">
                               <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 <div className="w-2 h-2 bg-wells-red rounded-full"></div>
-                                Service Execution Journey
+                                Execution Details
                               </h4>
-                              <div className="space-y-4">
-                                {log.serviceSteps.map((step, stepIndex) => (
-                                  <div
-                                    key={step.id}
-                                    className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200"
-                                  >
-                                    <div className="flex items-center gap-4 mb-3">
-                                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-wells-red to-red-600 text-white text-xs flex items-center justify-center font-bold shadow-sm">
-                                        {stepIndex + 1}
-                                      </div>
-                                      
-                                      <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-1">
-                                          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                                            {step.serviceName}
-                                          </h3>
-                                          <span className={`px-2 py-1 text-xs font-medium rounded-full shadow-sm ${getMethodColor(step.method)}`}>
-                                            {step.method}
-                                          </span>
-                                          {getStatusIcon(step.status)}
-                                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                                            {step.duration}ms
-                                          </span>
-                                        </div>
-                                        
-                                        <div className="text-sm text-gray-600 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                                          {step.url}
-                                        </div>
-                                        
-                                        <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                          {format(new Date(step.timestamp), 'MMM d, yyyy HH:mm:ss.SSS')}
-                                        </div>
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                      <div>
-                                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                          Request Payload
-                                        </h4>
-                                        <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-48 text-gray-900 dark:text-gray-100 shadow-inner">
-                                          {JSON.stringify(step.request, null, 2)}
-                                        </pre>
-                                      </div>
-                                      
-                                      <div>
-                                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                          Response Payload
-                                        </h4>
-                                        <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-48 text-gray-900 dark:text-gray-100 shadow-inner">
-                                          {JSON.stringify(step.response, null, 2)}
-                                        </pre>
-                                      </div>
+                              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Execution ID</p>
+                                    <p className="text-sm font-mono text-gray-900 dark:text-white">{log.id}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Duration</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{log.duration}ms</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</p>
+                                    <div className="flex items-center gap-2">
+                                      {getStatusIcon(log.status)}
+                                      <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">{log.status}</span>
                                     </div>
                                   </div>
-                                ))}
+                                  <div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Timestamp</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">{format(new Date(log.timestamp), 'MMM d, yyyy HH:mm:ss')}</p>
+                                  </div>
+                                  {log.errorMessage && (
+                                    <div className="col-span-2">
+                                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Error Message</p>
+                                      <p className="text-sm text-red-600 dark:text-red-400 font-mono bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                                        {log.errorMessage}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </td>
@@ -411,67 +296,51 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
 
             {/* Modal Content */}
             <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
-              <div className="space-y-6">
-                {selectedLog.serviceSteps.map((step, index) => (
-                  <motion.div
-                    key={step.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-wells-red to-red-600 text-white text-sm flex items-center justify-center font-bold shadow-lg">
-                        {index + 1}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                            {step.serviceName}
-                          </h3>
-                          <span className={`px-3 py-1 text-sm font-semibold rounded-full shadow-sm ${getMethodColor(step.method)}`}>
-                            {step.method}
-                          </span>
-                          {getStatusIcon(step.status)}
-                          <span className="text-sm text-gray-600 dark:text-gray-400 font-bold bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                            {step.duration}ms
-                          </span>
-                        </div>
-                        
-                        <div className="text-sm text-gray-600 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
-                          {step.url}
-                        </div>
-                        
-                        <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 font-medium">
-                          Executed at: {format(new Date(step.timestamp), 'MMM d, yyyy HH:mm:ss.SSS')}
-                        </div>
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Execution Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Execution ID</p>
+                    <p className="text-sm font-mono text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                      {selectedLog.id}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Test ID</p>
+                    <p className="text-sm font-mono text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                      {selectedLog.testId}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Duration</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">{selectedLog.duration}ms</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</p>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(selectedLog.status)}
+                      <span className="text-lg font-bold text-gray-900 dark:text-white capitalize">{selectedLog.status}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Arm/Option</p>
+                    {getOptionBadge(selectedLog.option || selectedLog.armKey)}
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Timestamp</p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      {format(new Date(selectedLog.timestamp), 'MMM d, yyyy HH:mm:ss.SSS')}
+                    </p>
+                  </div>
+                  {selectedLog.errorMessage && (
+                    <div className="col-span-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Error Message</p>
+                      <div className="text-sm text-red-600 dark:text-red-400 font-mono bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                        {selectedLog.errorMessage}
                       </div>
                     </div>
-                    
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full shadow-sm"></div>
-                          Request Payload
-                        </h4>
-                        <pre className="text-sm bg-gray-100 dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700 overflow-auto max-h-64 text-gray-900 dark:text-gray-100 shadow-inner font-mono leading-relaxed">
-                          {JSON.stringify(step.request, null, 2)}
-                        </pre>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                          <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
-                          Response Payload
-                        </h4>
-                        <pre className="text-sm bg-gray-100 dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700 overflow-auto max-h-64 text-gray-900 dark:text-gray-100 shadow-inner font-mono leading-relaxed">
-                          {JSON.stringify(step.response, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                  )}
+                </div>
               </div>
             </div>
 
@@ -479,7 +348,7 @@ export default function LogsTable({ logs, title, testId }: LogsTableProps) {
             <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Execution Summary:</span> {selectedLog.serviceSteps.length} services • Total {selectedLog.duration}ms
+                  <span className="font-medium">Execution completed in {selectedLog.duration}ms</span>
                 </div>
                 <button
                   onClick={() => setSelectedLog(null)}
