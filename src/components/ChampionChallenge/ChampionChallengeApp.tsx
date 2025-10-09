@@ -3,7 +3,7 @@ import { useChampionChallengeStore } from '../../stores/championChallengeStore';
 import { ComparisonDashboard } from './ComparisonDashboard';
 import { ExecutionCreator } from './ExecutionCreator';
 import { ExecutionList } from './ExecutionList';
-import { CompareAllSimpleDashboard } from './CompareAllSimpleDashboard';
+import { CompareAllAnalyticsDashboard } from './CompareAllAnalyticsDashboard';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Trophy, Plus, BarChart3 } from 'lucide-react';
@@ -149,7 +149,7 @@ export const ChampionChallengeApp: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         {activeTab === 'compareAll' ? (
-          <CompareAllSimpleDashboard />
+          <CompareAllAnalyticsDashboard />
         ) : (
           <>
         {currentView === 'list' && (
