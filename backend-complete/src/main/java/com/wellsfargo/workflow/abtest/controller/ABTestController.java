@@ -65,6 +65,21 @@ public class ABTestController {
         return ResponseEntity.ok(abTestService.getAnalytics(testId));
     }
 
+    @GetMapping("/{testId}/logs")
+    public ResponseEntity<List<ExecutionResultResponse>> getExecutionLogs(
+            @PathVariable String testId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+        log.info("Fetching execution logs for A/B test: {}, page: {}, size: {}", testId, page, size);
+        return ResponseEntity.ok(abTestService.getExecutionLogs(testId, page, size));
+    }
+
+    @GetMapping("/{testId}/comprehensive-metrics")
+    public ResponseEntity<ABTestAnalyticsResponse> getComprehensiveMetrics(@PathVariable String testId) {
+        log.info("Fetching comprehensive metrics for A/B test: {}", testId);
+        return ResponseEntity.ok(abTestService.calculateComprehensiveMetrics(testId));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
         log.error("Runtime exception", ex);

@@ -262,8 +262,23 @@ export class ABTestService {
   async getLogs(testId: string, page: number, pageSize: number): Promise<ExecutionLog[]> {
     if (this.useBackend) {
       try {
-        const analytics = await abTestApiService.getAnalytics(testId);
-        return this.mapAnalyticsToLogs(analytics, testId);
+        const logs = await abTestApiService.getExecutionLogs(testId, page, pageSize);
+        return logs.map(log => ({
+          id: log.executionId || `exec-${Date.now()}`,
+          testId: log.testId,
+          armKey: log.selectedArmId.substring(0, 1),
+          option: log.selectedArmId.substring(0, 1),
+          armName: '',
+          status: log.status.toLowerCase() as 'success' | 'error',
+          duration: Number(log.executionTimeMs),
+          timestamp: log.timestamp ? new Date(log.timestamp).toISOString() : new Date().toISOString(),
+          errorMessage: log.errorMessage,
+          serviceName: '',
+          serviceSteps: [],
+          retryCount: 0,
+          queueTime: 0,
+          activityExecutions: [],
+        }));
       } catch (error) {
         console.warn('Backend API failed, using mock data:', error);
         this.useBackend = false;

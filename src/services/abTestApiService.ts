@@ -206,6 +206,18 @@ class ABTestApiService {
     });
   }
 
+  async getExecutionLogs(testId: string, page: number = 0, size: number = 100): Promise<ExecutionResultResponse[]> {
+    return this.apiCall<ExecutionResultResponse[]>(`/${testId}/logs?page=${page}&size=${size}`, {
+      method: 'GET',
+    });
+  }
+
+  async getComprehensiveMetrics(testId: string): Promise<ABTestAnalyticsResponse> {
+    return this.apiCall<ABTestAnalyticsResponse>(`/${testId}/comprehensive-metrics`, {
+      method: 'GET',
+    });
+  }
+
   async healthCheck(): Promise<{ status: string }> {
     try {
       const response = await fetch(`${BACKEND_BASE_URL}/actuator/health`);
