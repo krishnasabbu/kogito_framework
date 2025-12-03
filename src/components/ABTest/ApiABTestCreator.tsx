@@ -1,36 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save, Plus, Trash2, Play } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { ApiVariant, CreateApiABTestRequest } from '../../types/apiAbtest';
+import { ApiVariant, CreateApiABTestRequest, ApiABTest } from '../../types/apiAbtest';
 import { apiABTestService } from '../../services/apiAbtestService';
 import toast from 'react-hot-toast';
 
 interface ApiABTestCreatorProps {
+  testToEdit?: ApiABTest;
   onClose: () => void;
   onSave?: () => void;
 }
 
-export const ApiABTestCreator: React.FC<ApiABTestCreatorProps> = ({ onClose, onSave }) => {
-  const [testName, setTestName] = useState('');
-  const [description, setDescription] = useState('');
-  const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'>('POST');
-  const [requestPayload, setRequestPayload] = useState('{}');
-  const [headers, setHeaders] = useState('{}');
-  const [variants, setVariants] = useState<Partial<ApiVariant>[]>([
-    { name: 'API A (Control)', apiEndpoint: '', trafficPercentage: 50, isControl: true },
-    { name: 'API B (Variant)', apiEndpoint: '', trafficPercentage: 50, isControl: false }
-  ]);
+export const ApiABTestCreator: React.FC<ApiABTestCreatorProps> = ({ testToEdit, onClose, onSave }) => {
+  const isEditMode = !!testToEdit;
 
-  const [successCriteria, setSuccessCriteria] = useState({
-    primaryMetric: 'latency' as const,
-    minimumSampleSize: 100,
-    confidenceLevel: 95,
-    minimumDetectableEffect: 10,
-    maxDurationDays: 7
-  });
+  const [testName, setTestName] = useState(testToEdit?.name || '');
+  const [description, setDescription] = useState(testToEdit?.description || '');
+  const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'>(testToEdit?.method || 'POST');
+  const [requestPayload, setRequestPayload] = useState(JSON.stringify(testToEdit?.requestPayload || {}, null, 2));
+  const [headers, setHeaders] = useState(JSON.stringify(testToEdit?.headers || {}, null, 2));
+  const [variants, setVariants] = useState<Partial<ApiVariant>[]>(
+    testToEdit?.variants || [
+      { name: 'API A (Control)', apiEndpoint: '', trafficPercentage: 50, isControl: true },
+      { name: 'API B (Variant)', apiEndpoint: '', trafficPercentage: 50, isControl: false }
+    ]
+  );
+
+  const [successCriteria, setSuccessCriteria] = useState(
+    testToEdit?.successCriteria || {
+      primaryMetric: 'latency' as const,
+      minimumSampleSize: 100,
+      confidenceLevel: 95,
+      minimumDetectableEffect: 10,
+      maxDurationDays: 7
+    }
+  );
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -63,6 +70,14 @@ export const ApiABTestCreator: React.FC<ApiABTestCreatorProps> = ({ onClose, onS
   const updateVariant = (index: number, field: keyof ApiVariant, value: any) => {
     const newVariants = [...variants];
     newVariants[index] = { ...newVariants[index], [field]: value };
+
+    if (field === 'trafficPercentage' && variants.length === 2) {
+      const otherIndex = index === 0 ? 1 : 0;
+      const newPercentage = Math.max(0, Math.min(100, parseInt(value) || 0));
+      newVariants[index].trafficPercentage = newPercentage;
+      newVariants[otherIndex].trafficPercentage = 100 - newPercentage;
+    }
+
     setVariants(newVariants);
   };
 
@@ -121,28 +136,34 @@ export const ApiABTestCreator: React.FC<ApiABTestCreatorProps> = ({ onClose, onS
         name: testName,
         description,
         method,
-        requestPayload: requestPayload.trim() ? JSON.parse(requestPayload) : undefined,
-        headers: headers.trim() ? JSON.parse(headers) : undefined,
+        requestPayload: requestPayload.trim() && requestPayload.trim() !== '{}' ? JSON.parse(requestPayload) : undefined,
+        headers: headers.trim() && headers.trim() !== '{}' ? JSON.parse(headers) : undefined,
         variants: variants.map(v => ({
           name: v.name!,
           description: v.description,
           apiEndpoint: v.apiEndpoint!,
           headers: v.headers,
           trafficPercentage: v.trafficPercentage!,
-          isControl: v.isControl!
+          isControl: v.isControl || false
         })),
         trafficSplit: variants[0].trafficPercentage || 50,
         successCriteria
       };
 
-      await apiABTestService.createTest(request);
+      if (isEditMode && testToEdit) {
+        await apiABTestService.updateTest(testToEdit.id, request);
+        toast.success('A/B test updated successfully!');
+      } else {
+        await apiABTestService.createTest(request);
+        toast.success('A/B test created successfully!');
+      }
 
-      toast.success('A/B test created successfully!');
       onSave?.();
       onClose();
-    } catch (error) {
-      console.error('Failed to create test:', error);
-      toast.error('Failed to create A/B test');
+    } catch (error: any) {
+      console.error('Failed to save test:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to save A/B test';
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -153,8 +174,12 @@ export const ApiABTestCreator: React.FC<ApiABTestCreatorProps> = ({ onClose, onS
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create API A/B Test</h2>
-            <p className="text-gray-600 dark:text-gray-400">Compare different API endpoints to find the best performer</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {isEditMode ? 'Edit API A/B Test' : 'Create API A/B Test'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              {isEditMode ? 'Update your API test configuration' : 'Compare different API endpoints to find the best performer'}
+            </p>
           </div>
 
           <button
@@ -422,7 +447,7 @@ export const ApiABTestCreator: React.FC<ApiABTestCreatorProps> = ({ onClose, onS
             className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
           >
             <Save className="w-4 h-4 mr-2" />
-            {isSaving ? 'Creating...' : 'Create A/B Test'}
+            {isSaving ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update A/B Test' : 'Create A/B Test')}
           </Button>
         </div>
       </div>

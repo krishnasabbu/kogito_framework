@@ -21,7 +21,8 @@ import {
   Calendar,
   Zap,
   AlertTriangle,
-  PieChart
+  PieChart,
+  Edit
 } from 'lucide-react';
 import { ApiABTest, ApiABTestMetrics, ApiABTestExecution } from '../../types/apiAbtest';
 import { apiABTestService } from '../../services/apiAbtestService';
@@ -61,6 +62,7 @@ export const ApiABTestDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<ApiABTestMetrics | null>(null);
   const [executions, setExecutions] = useState<ApiABTestExecution[]>([]);
   const [showCreator, setShowCreator] = useState(false);
+  const [testToEdit, setTestToEdit] = useState<ApiABTest | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [timeFilter, setTimeFilter] = useState('24h');
   const [view, setView] = useState<'list' | 'detail'>('list');
@@ -169,6 +171,22 @@ export const ApiABTestDashboard: React.FC = () => {
     setView('detail');
   };
 
+  const handleEditTest = (test: ApiABTest) => {
+    setTestToEdit(test);
+    setShowCreator(true);
+  };
+
+  const handleCloseCreator = () => {
+    setShowCreator(false);
+    setTestToEdit(undefined);
+  };
+
+  const handleSaveTest = () => {
+    setShowCreator(false);
+    setTestToEdit(undefined);
+    loadTests();
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -270,11 +288,9 @@ export const ApiABTestDashboard: React.FC = () => {
 
         {showCreator && (
           <ApiABTestCreator
-            onClose={() => setShowCreator(false)}
-            onSave={() => {
-              setShowCreator(false);
-              loadTests();
-            }}
+            testToEdit={testToEdit}
+            onClose={handleCloseCreator}
+            onSave={handleSaveTest}
           />
         )}
       </div>
@@ -354,6 +370,10 @@ export const ApiABTestDashboard: React.FC = () => {
 
             <Button variant="outline" onClick={() => loadMetrics(selectedTest.id)}>
               <RefreshCw size={16} />
+            </Button>
+
+            <Button variant="outline" onClick={() => handleEditTest(selectedTest)}>
+              <Edit className="w-4 h-4" />
             </Button>
 
             <Button variant="outline" onClick={() => handleDeleteTest(selectedTest.id)}>
@@ -594,11 +614,9 @@ export const ApiABTestDashboard: React.FC = () => {
 
       {showCreator && (
         <ApiABTestCreator
-          onClose={() => setShowCreator(false)}
-          onSave={() => {
-            setShowCreator(false);
-            loadTests();
-          }}
+          testToEdit={testToEdit}
+          onClose={handleCloseCreator}
+          onSave={handleSaveTest}
         />
       )}
     </div>

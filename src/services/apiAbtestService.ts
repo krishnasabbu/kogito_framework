@@ -253,6 +253,36 @@ class ApiABTestService {
     return test!;
   }
 
+  async updateTest(testId: string, request: CreateApiABTestRequest): Promise<ApiABTest> {
+    const testIndex = this.mockTests.findIndex(t => t.id === testId);
+    if (testIndex === -1) throw new Error('Test not found');
+
+    const existingTest = this.mockTests[testIndex];
+    const updatedTest: ApiABTest = {
+      ...existingTest,
+      name: request.name,
+      description: request.description,
+      variants: request.variants.map((v, index) => ({
+        id: existingTest.variants[index]?.id || `var-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: v.name,
+        description: v.description,
+        apiEndpoint: v.apiEndpoint,
+        headers: v.headers,
+        trafficPercentage: v.trafficPercentage,
+        isControl: v.isControl
+      })),
+      trafficSplit: request.trafficSplit,
+      method: request.method,
+      requestPayload: request.requestPayload,
+      headers: request.headers,
+      successCriteria: request.successCriteria,
+      updatedAt: new Date()
+    };
+
+    this.mockTests[testIndex] = updatedTest;
+    return updatedTest;
+  }
+
   async deleteTest(testId: string): Promise<void> {
     this.mockTests = this.mockTests.filter(t => t.id !== testId);
     this.mockExecutions.delete(testId);
