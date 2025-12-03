@@ -18,7 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
   const navItems = [
     { path: '/kogito/workflows', label: 'Kogito Workflows', icon: Workflow },
     { path: '/services', label: 'Services', icon: Server },
-    { path: '/kogito/ab-tests', label: 'A/B Tests', icon: BarChart3 },
+    { path: '/api-abtest', label: 'API A/B Tests', icon: BarChart3 },
     { path: '/champion-challenge', label: 'Champion vs Challenge', icon: Trophy },
   ];
 

@@ -7,6 +7,7 @@ import KogitoApp from './components/Kogito/KogitoApp';
 import ServicesApp from './components/Services/ServicesApp';
 import ServiceEditor from './components/Services/ServiceEditor';
 import { ChampionChallengeApp } from './components/ChampionChallenge/ChampionChallengeApp';
+import { ApiABTestDashboard } from './components/ABTest/ApiABTestDashboard';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
              <Route path="services/new" element={<ServiceEditor />} />
              <Route path="services/:id/edit" element={<ServiceEditor />} />
              <Route path="champion-challenge" element={<ChampionChallengeApp />} />
+             <Route path="api-abtest" element={<ApiABTestDashboard />} />
             </Route>
           </Routes>
 
