@@ -798,16 +798,29 @@ const EnhancedMetricsPanel: React.FC<{ metrics: ApiABTestMetrics; test: ApiABTes
 };
 
 const ExecutionLogsTable: React.FC<{ executions: ApiABTestExecution[] }> = ({ executions }) => {
+  const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set());
+
+  const toggleRow = (execId: string) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(execId)) {
+      newExpanded.delete(execId);
+    } else {
+      newExpanded.add(execId);
+    }
+    setExpandedRows(newExpanded);
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Execution Logs</CardTitle>
+        <CardTitle>Execution Logs with Payloads</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700">
+                <th className="text-left py-2 px-4 w-8"></th>
                 <th className="text-left py-2 px-4">Timestamp</th>
                 <th className="text-left py-2 px-4">Variant</th>
                 <th className="text-left py-2 px-4">Status</th>
@@ -817,36 +830,81 @@ const ExecutionLogsTable: React.FC<{ executions: ApiABTestExecution[] }> = ({ ex
             </thead>
             <tbody>
               {executions.slice(0, 100).map(exec => (
-                <tr key={exec.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <td className="py-2 px-4">{new Date(exec.timestamp).toLocaleString()}</td>
-                  <td className="py-2 px-4">{exec.variantName}</td>
-                  <td className="py-2 px-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded ${
-                        exec.status === 'success'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-                          : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                      }`}
-                    >
-                      {exec.status}
-                    </span>
-                  </td>
-                  <td className="text-right py-2 px-4">{exec.latencyMs}ms</td>
-                  <td className="text-right py-2 px-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded ${
-                        exec.statusCode === 200
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-                          : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                      }`}
-                    >
-                      {exec.statusCode}
-                    </span>
-                  </td>
-                </tr>
+                <React.Fragment key={exec.id}>
+                  <tr
+                    className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                    onClick={() => toggleRow(exec.id)}
+                  >
+                    <td className="py-2 px-4">
+                      <button className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        {expandedRows.has(exec.id) ? '▼' : '▶'}
+                      </button>
+                    </td>
+                    <td className="py-2 px-4">{new Date(exec.timestamp).toLocaleString()}</td>
+                    <td className="py-2 px-4">{exec.variantName}</td>
+                    <td className="py-2 px-4">
+                      <span
+                        className={`px-2 py-1 text-xs rounded ${
+                          exec.status === 'success'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                            : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                        }`}
+                      >
+                        {exec.status}
+                      </span>
+                    </td>
+                    <td className="text-right py-2 px-4">{exec.latencyMs}ms</td>
+                    <td className="text-right py-2 px-4">
+                      <span
+                        className={`px-2 py-1 text-xs rounded ${
+                          exec.statusCode === 200
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                            : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                        }`}
+                      >
+                        {exec.statusCode}
+                      </span>
+                    </td>
+                  </tr>
+                  {expandedRows.has(exec.id) && (
+                    <tr className="bg-gray-50 dark:bg-gray-900">
+                      <td colSpan={6} className="py-4 px-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          <div>
+                            <div className="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                              <span className="text-blue-500">→</span> Request Payload
+                            </div>
+                            <pre className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto text-xs">
+                              {JSON.stringify(exec.requestPayload, null, 2)}
+                            </pre>
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                              <span className="text-green-500">←</span> Response Payload
+                            </div>
+                            <pre className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto text-xs">
+                              {JSON.stringify(exec.responsePayload, null, 2)}
+                            </pre>
+                            {exec.errorMessage && (
+                              <div className="mt-2">
+                                <div className="font-semibold text-red-600 dark:text-red-400 mb-1">Error Message</div>
+                                <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded text-red-700 dark:text-red-400 text-xs">
+                                  {exec.errorMessage}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+          Showing {Math.min(100, executions.length)} of {executions.length} executions. Click any row to view request/response details.
         </div>
       </CardContent>
     </Card>
@@ -854,10 +912,22 @@ const ExecutionLogsTable: React.FC<{ executions: ApiABTestExecution[] }> = ({ ex
 };
 
 const ExecutionTimeline: React.FC<{ executions: ApiABTestExecution[] }> = ({ executions }) => {
+  const [expandedItems, setExpandedItems] = React.useState<Set<string>>(new Set());
+
+  const toggleItem = (execId: string) => {
+    const newExpanded = new Set(expandedItems);
+    if (newExpanded.has(execId)) {
+      newExpanded.delete(execId);
+    } else {
+      newExpanded.add(execId);
+    }
+    setExpandedItems(newExpanded);
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Execution Timeline</CardTitle>
+        <CardTitle>Execution Timeline with Payloads</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -876,29 +946,68 @@ const ExecutionTimeline: React.FC<{ executions: ApiABTestExecution[] }> = ({ exe
                   }`}
                 />
                 {index < executions.length - 1 && (
-                  <div className="w-0.5 h-12 bg-gray-200 dark:bg-gray-700" />
+                  <div className="w-0.5 h-full bg-gray-200 dark:bg-gray-700" />
                 )}
               </div>
               <div className="flex-1 pb-8">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium">{exec.variantName}</span>
-                  <span className="text-sm text-gray-500">
-                    {new Date(exec.timestamp).toLocaleTimeString()}
-                  </span>
+                <div
+                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg -m-2"
+                  onClick={() => toggleItem(exec.id)}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{exec.variantName}</span>
+                      <button className="text-xs text-gray-500">
+                        {expandedItems.has(exec.id) ? '▼' : '▶'}
+                      </button>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {new Date(exec.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <span>Latency: {exec.latencyMs}ms</span>
+                    <span>Status: {exec.statusCode}</span>
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded ${
+                        exec.status === 'success'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                          : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                      }`}
+                    >
+                      {exec.status}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                  <span>Latency: {exec.latencyMs}ms</span>
-                  <span>Status: {exec.statusCode}</span>
-                  <span
-                    className={`px-2 py-0.5 text-xs rounded ${
-                      exec.status === 'success'
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-                        : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                    }`}
+                {expandedItems.has(exec.id) && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-3 space-y-3"
                   >
-                    {exec.status}
-                  </span>
-                </div>
+                    <div>
+                      <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                        <span className="text-blue-500">→</span> Request
+                      </div>
+                      <pre className="bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto text-xs">
+                        {JSON.stringify(exec.requestPayload, null, 2)}
+                      </pre>
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                        <span className="text-green-500">←</span> Response
+                      </div>
+                      <pre className="bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto text-xs">
+                        {JSON.stringify(exec.responsePayload, null, 2)}
+                      </pre>
+                    </div>
+                    {exec.errorMessage && (
+                      <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded text-red-700 dark:text-red-400 text-xs">
+                        <span className="font-semibold">Error:</span> {exec.errorMessage}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           ))}
