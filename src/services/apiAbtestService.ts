@@ -7,17 +7,203 @@ import {
   ExecuteApiABTestRequest,
   ApiTimeSeriesPoint
 } from '../types/apiAbtest';
-import { supabase } from '../lib/supabaseClient';
 
 class ApiABTestService {
+  private mockTests: ApiABTest[] = [];
+  private mockExecutions: Map<string, ApiABTestExecution[]> = new Map();
+
+  constructor() {
+    this.initializeMockData();
+  }
+
+  private initializeMockData() {
+    const test1Id = 'test-1';
+    const test2Id = 'test-2';
+    const test3Id = 'test-3';
+
+    this.mockTests = [
+      {
+        id: test1Id,
+        name: 'Payment Gateway Comparison',
+        description: 'Testing Stripe vs Braintree for payment processing',
+        status: 'running',
+        variants: [
+          {
+            id: 'var-1a',
+            name: 'Stripe API',
+            description: 'Current payment provider',
+            apiEndpoint: 'https://api.stripe.com/v1/charges',
+            headers: { 'Authorization': 'Bearer sk_test_...' },
+            trafficPercentage: 50,
+            isControl: true
+          },
+          {
+            id: 'var-1b',
+            name: 'Braintree API',
+            description: 'Alternative payment provider',
+            apiEndpoint: 'https://api.braintreegateway.com/payments',
+            headers: { 'Authorization': 'Basic ...' },
+            trafficPercentage: 50,
+            isControl: false
+          }
+        ],
+        trafficSplit: 50,
+        method: 'POST',
+        requestPayload: {
+          amount: 100,
+          currency: 'USD',
+          cardToken: 'tok_123'
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        successCriteria: {
+          primaryMetric: 'latency',
+          minimumSampleSize: 500,
+          confidenceLevel: 95,
+          minimumDetectableEffect: 10,
+          maxDurationDays: 7
+        },
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
+        createdBy: 'user@example.com'
+      },
+      {
+        id: test2Id,
+        name: 'API Gateway Load Balancer',
+        description: 'Testing different geographic regions for optimal latency',
+        status: 'running',
+        variants: [
+          {
+            id: 'var-2a',
+            name: 'US East',
+            apiEndpoint: 'https://api-us-east.example.com/data',
+            trafficPercentage: 34,
+            isControl: true
+          },
+          {
+            id: 'var-2b',
+            name: 'US West',
+            apiEndpoint: 'https://api-us-west.example.com/data',
+            trafficPercentage: 33,
+            isControl: false
+          },
+          {
+            id: 'var-2c',
+            name: 'EU Central',
+            apiEndpoint: 'https://api-eu.example.com/data',
+            trafficPercentage: 33,
+            isControl: false
+          }
+        ],
+        trafficSplit: 34,
+        method: 'GET',
+        successCriteria: {
+          primaryMetric: 'latency',
+          minimumSampleSize: 300,
+          confidenceLevel: 95,
+          minimumDetectableEffect: 15,
+          maxDurationDays: 3
+        },
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+        createdBy: 'user@example.com'
+      },
+      {
+        id: test3Id,
+        name: 'Authentication Service Migration',
+        description: 'Migrating from legacy auth to new OAuth2 service',
+        status: 'draft',
+        variants: [
+          {
+            id: 'var-3a',
+            name: 'Legacy Auth',
+            apiEndpoint: 'https://auth.old.example.com/login',
+            trafficPercentage: 80,
+            isControl: true
+          },
+          {
+            id: 'var-3b',
+            name: 'OAuth2 Service',
+            apiEndpoint: 'https://oauth.new.example.com/v2/token',
+            trafficPercentage: 20,
+            isControl: false
+          }
+        ],
+        trafficSplit: 80,
+        method: 'POST',
+        requestPayload: {
+          username: 'user@example.com',
+          password: '***'
+        },
+        successCriteria: {
+          primaryMetric: 'success_rate',
+          minimumSampleSize: 1000,
+          confidenceLevel: 99,
+          minimumDetectableEffect: 5,
+          maxDurationDays: 14
+        },
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 30 * 60 * 1000),
+        createdBy: 'user@example.com'
+      }
+    ];
+
+    this.generateMockExecutions(test1Id, this.mockTests[0].variants, 450);
+    this.generateMockExecutions(test2Id, this.mockTests[1].variants, 280);
+  }
+
+  private generateMockExecutions(testId: string, variants: any[], count: number) {
+    const executions: ApiABTestExecution[] = [];
+    const now = Date.now();
+    const timeSpan = 2 * 24 * 60 * 60 * 1000;
+
+    for (let i = 0; i < count; i++) {
+      const variant = variants[Math.floor(Math.random() * variants.length)];
+      const timestamp = new Date(now - Math.random() * timeSpan);
+
+      let latencyMs: number;
+      let statusCode: number;
+      let status: 'success' | 'error';
+
+      if (variant.name.includes('Stripe') || variant.name.includes('Legacy') || variant.name.includes('US East')) {
+        latencyMs = Math.floor(200 + Math.random() * 100);
+        statusCode = Math.random() > 0.04 ? 200 : 500;
+      } else {
+        latencyMs = Math.floor(150 + Math.random() * 80);
+        statusCode = Math.random() > 0.02 ? 200 : 500;
+      }
+
+      status = statusCode === 200 ? 'success' : 'error';
+
+      executions.push({
+        id: `exec-${testId}-${i}`,
+        testId,
+        variantId: variant.id,
+        variantName: variant.name,
+        status,
+        latencyMs,
+        statusCode,
+        requestPayload: { test: 'data' },
+        responsePayload: status === 'success' ? { success: true } : { error: 'Internal error' },
+        errorMessage: status === 'error' ? 'Internal server error' : undefined,
+        timestamp
+      });
+    }
+
+    this.mockExecutions.set(testId, executions.sort((a, b) =>
+      b.timestamp.getTime() - a.timestamp.getTime()
+    ));
+  }
+
   async createTest(request: CreateApiABTestRequest): Promise<ApiABTest> {
     const test: ApiABTest = {
-      id: crypto.randomUUID(),
+      id: `test-${Date.now()}`,
       name: request.name,
       description: request.description,
       status: 'draft',
       variants: request.variants.map(v => ({
-        id: crypto.randomUUID(),
+        id: `var-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: v.name,
         description: v.description,
         apiEndpoint: v.apiEndpoint,
@@ -35,147 +221,41 @@ class ApiABTestService {
       createdBy: 'current-user'
     };
 
-    const { error } = await supabase
-      .from('api_ab_tests')
-      .insert({
-        id: test.id,
-        name: test.name,
-        description: test.description,
-        status: test.status,
-        variants: test.variants,
-        traffic_split: test.trafficSplit,
-        method: test.method,
-        request_payload: test.requestPayload,
-        headers: test.headers,
-        success_criteria: test.successCriteria,
-        created_by: test.createdBy
-      });
-
-    if (error) {
-      console.error('Failed to save test to database:', error);
-    }
+    this.mockTests.unshift(test);
+    this.mockExecutions.set(test.id, []);
 
     return test;
   }
 
   async getAllTests(): Promise<ApiABTest[]> {
-    const { data, error } = await supabase
-      .from('api_ab_tests')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Failed to fetch tests:', error);
-      return [];
-    }
-
-    return data.map(d => ({
-      id: d.id,
-      name: d.name,
-      description: d.description,
-      status: d.status,
-      variants: d.variants,
-      trafficSplit: d.traffic_split,
-      method: d.method,
-      requestPayload: d.request_payload,
-      headers: d.headers,
-      successCriteria: d.success_criteria,
-      createdAt: new Date(d.created_at),
-      updatedAt: new Date(d.updated_at),
-      createdBy: d.created_by
-    }));
+    return [...this.mockTests];
   }
 
   async getTest(testId: string): Promise<ApiABTest | null> {
-    const { data, error } = await supabase
-      .from('api_ab_tests')
-      .select('*')
-      .eq('id', testId)
-      .maybeSingle();
-
-    if (error || !data) {
-      console.error('Failed to fetch test:', error);
-      return null;
-    }
-
-    return {
-      id: data.id,
-      name: data.name,
-      description: data.description,
-      status: data.status,
-      variants: data.variants,
-      trafficSplit: data.traffic_split,
-      method: data.method,
-      requestPayload: data.request_payload,
-      headers: data.headers,
-      successCriteria: data.success_criteria,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at),
-      createdBy: data.created_by
-    };
+    return this.mockTests.find(t => t.id === testId) || null;
   }
 
   async startTest(testId: string): Promise<ApiABTest> {
-    const { data, error } = await supabase
-      .from('api_ab_tests')
-      .update({ status: 'running', updated_at: new Date().toISOString() })
-      .eq('id', testId)
-      .select()
-      .single();
-
-    if (error) throw new Error('Failed to start test');
-
-    return {
-      id: data.id,
-      name: data.name,
-      description: data.description,
-      status: data.status,
-      variants: data.variants,
-      trafficSplit: data.traffic_split,
-      method: data.method,
-      requestPayload: data.request_payload,
-      headers: data.headers,
-      successCriteria: data.success_criteria,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at),
-      createdBy: data.created_by
-    };
+    const test = this.mockTests.find(t => t.id === testId);
+    if (test) {
+      test.status = 'running';
+      test.updatedAt = new Date();
+    }
+    return test!;
   }
 
   async pauseTest(testId: string): Promise<ApiABTest> {
-    const { data, error } = await supabase
-      .from('api_ab_tests')
-      .update({ status: 'paused', updated_at: new Date().toISOString() })
-      .eq('id', testId)
-      .select()
-      .single();
-
-    if (error) throw new Error('Failed to pause test');
-
-    return {
-      id: data.id,
-      name: data.name,
-      description: data.description,
-      status: data.status,
-      variants: data.variants,
-      trafficSplit: data.traffic_split,
-      method: data.method,
-      requestPayload: data.request_payload,
-      headers: data.headers,
-      successCriteria: data.success_criteria,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at),
-      createdBy: data.created_by
-    };
+    const test = this.mockTests.find(t => t.id === testId);
+    if (test) {
+      test.status = 'paused';
+      test.updatedAt = new Date();
+    }
+    return test!;
   }
 
   async deleteTest(testId: string): Promise<void> {
-    const { error } = await supabase
-      .from('api_ab_tests')
-      .delete()
-      .eq('id', testId);
-
-    if (error) throw new Error('Failed to delete test');
+    this.mockTests = this.mockTests.filter(t => t.id !== testId);
+    this.mockExecutions.delete(testId);
   }
 
   selectVariant(test: ApiABTest): { variantId: string; variant: any } {
@@ -202,48 +282,12 @@ class ApiABTestService {
 
     const { variantId, variant } = this.selectVariant(test);
 
-    const startTime = Date.now();
-    let status: 'success' | 'error' = 'success';
-    let statusCode = 200;
-    let responsePayload: any = null;
-    let errorMessage: string | undefined;
-
-    try {
-      const headers = {
-        'Content-Type': 'application/json',
-        ...test.headers,
-        ...variant.headers,
-        ...request.overrideHeaders
-      };
-
-      const payload = request.requestPayload || test.requestPayload;
-
-      const response = await fetch(variant.apiEndpoint, {
-        method: test.method,
-        headers,
-        body: test.method !== 'GET' ? JSON.stringify(payload) : undefined
-      });
-
-      statusCode = response.status;
-
-      if (!response.ok) {
-        status = 'error';
-        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-      }
-
-      responsePayload = await response.json().catch(() => response.text());
-
-    } catch (error) {
-      status = 'error';
-      statusCode = 0;
-      errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      responsePayload = null;
-    }
-
-    const latencyMs = Date.now() - startTime;
+    const latencyMs = Math.floor(150 + Math.random() * 150);
+    const statusCode = Math.random() > 0.03 ? 200 : 500;
+    const status: 'success' | 'error' = statusCode === 200 ? 'success' : 'error';
 
     const execution: ApiABTestExecution = {
-      id: crypto.randomUUID(),
+      id: `exec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       testId: test.id,
       variantId,
       variantName: variant.name,
@@ -251,38 +295,38 @@ class ApiABTestService {
       latencyMs,
       statusCode,
       requestPayload: request.requestPayload || test.requestPayload,
-      responsePayload,
-      errorMessage,
+      responsePayload: status === 'success' ? { success: true, data: {} } : { error: 'Failed' },
+      errorMessage: status === 'error' ? 'Execution failed' : undefined,
       timestamp: new Date()
     };
 
-    const { error } = await supabase
-      .from('api_ab_test_executions')
-      .insert({
-        id: execution.id,
-        test_id: execution.testId,
-        variant_id: execution.variantId,
-        variant_name: execution.variantName,
-        status: execution.status,
-        latency_ms: execution.latencyMs,
-        status_code: execution.statusCode,
-        request_payload: execution.requestPayload,
-        response_payload: execution.responsePayload,
-        error_message: execution.errorMessage
-      });
-
-    if (error) {
-      console.error('Failed to save execution:', error);
-    }
+    const executions = this.mockExecutions.get(test.id) || [];
+    executions.unshift(execution);
+    this.mockExecutions.set(test.id, executions);
 
     return execution;
   }
 
   async getMetrics(testId: string, timeFilter?: string): Promise<ApiABTestMetrics> {
-    let query = supabase
-      .from('api_ab_test_executions')
-      .select('*')
-      .eq('test_id', testId);
+    const executions = this.mockExecutions.get(testId) || [];
+
+    if (executions.length === 0) {
+      return {
+        testId,
+        totalExecutions: 0,
+        variantStats: {},
+        timeSeriesData: [],
+        latencyPercentiles: {},
+        statusCodeDistribution: {}
+      };
+    }
+
+    const test = await this.getTest(testId);
+    if (!test) {
+      throw new Error('Test not found');
+    }
+
+    let filteredExecutions = [...executions];
 
     if (timeFilter) {
       const now = new Date();
@@ -303,45 +347,17 @@ class ApiABTestService {
           break;
       }
 
-      query = query.gte('created_at', startDate.toISOString());
-    }
-
-    const { data: executions, error } = await query;
-
-    if (error || !executions) {
-      console.error('Failed to fetch executions:', error);
-      return {
-        testId,
-        totalExecutions: 0,
-        variantStats: {},
-        timeSeriesData: [],
-        latencyPercentiles: {},
-        statusCodeDistribution: {}
-      };
+      filteredExecutions = filteredExecutions.filter(e => e.timestamp >= startDate);
     }
 
     const variantStats: Record<string, ApiVariantStats> = {};
     const variantExecutions: Record<string, ApiABTestExecution[]> = {};
 
-    executions.forEach(exec => {
-      const execution: ApiABTestExecution = {
-        id: exec.id,
-        testId: exec.test_id,
-        variantId: exec.variant_id,
-        variantName: exec.variant_name,
-        status: exec.status,
-        latencyMs: exec.latency_ms,
-        statusCode: exec.status_code,
-        requestPayload: exec.request_payload,
-        responsePayload: exec.response_payload,
-        errorMessage: exec.error_message,
-        timestamp: new Date(exec.created_at)
-      };
-
-      if (!variantExecutions[exec.variant_id]) {
-        variantExecutions[exec.variant_id] = [];
+    filteredExecutions.forEach(exec => {
+      if (!variantExecutions[exec.variantId]) {
+        variantExecutions[exec.variantId] = [];
       }
-      variantExecutions[exec.variant_id].push(execution);
+      variantExecutions[exec.variantId].push(exec);
     });
 
     Object.entries(variantExecutions).forEach(([variantId, execs]) => {
@@ -353,16 +369,18 @@ class ApiABTestService {
         statusCodes[e.statusCode] = (statusCodes[e.statusCode] || 0) + 1;
       });
 
+      const variant = test.variants.find(v => v.id === variantId);
+
       variantStats[variantId] = {
         variantId,
-        variantName: execs[0].variantName,
+        variantName: variant?.name || execs[0].variantName,
         executions: execs.length,
         successRate: successes / execs.length,
         errorRate: 1 - (successes / execs.length),
         avgLatency: latencies.reduce((a, b) => a + b, 0) / latencies.length,
-        p50Latency: latencies[Math.floor(latencies.length * 0.5)],
-        p95Latency: latencies[Math.floor(latencies.length * 0.95)],
-        p99Latency: latencies[Math.floor(latencies.length * 0.99)],
+        p50Latency: latencies[Math.floor(latencies.length * 0.5)] || 0,
+        p95Latency: latencies[Math.floor(latencies.length * 0.95)] || 0,
+        p99Latency: latencies[Math.floor(latencies.length * 0.99)] || 0,
         minLatency: Math.min(...latencies),
         maxLatency: Math.max(...latencies),
         throughput: execs.length / (24 * 3600),
@@ -370,11 +388,11 @@ class ApiABTestService {
       };
     });
 
-    const timeSeriesData = this.generateTimeSeries(executions);
+    const timeSeriesData = this.generateTimeSeries(filteredExecutions, test.variants);
 
     return {
       testId,
-      totalExecutions: executions.length,
+      totalExecutions: filteredExecutions.length,
       variantStats,
       timeSeriesData,
       latencyPercentiles: Object.fromEntries(
@@ -382,7 +400,7 @@ class ApiABTestService {
           id,
           {
             p50: stats.p50Latency,
-            p90: stats.p95Latency * 0.9,
+            p90: Math.floor(stats.p95Latency * 0.95),
             p95: stats.p95Latency,
             p99: stats.p99Latency
           }
@@ -401,11 +419,11 @@ class ApiABTestService {
     };
   }
 
-  private generateTimeSeries(executions: any[]): ApiTimeSeriesPoint[] {
-    const buckets: Record<string, Record<string, any[]>> = {};
+  private generateTimeSeries(executions: ApiABTestExecution[], variants: any[]): ApiTimeSeriesPoint[] {
+    const buckets: Record<string, Record<string, ApiABTestExecution[]>> = {};
 
     executions.forEach(exec => {
-      const timestamp = new Date(exec.created_at);
+      const timestamp = new Date(exec.timestamp);
       const bucketKey = new Date(
         timestamp.getFullYear(),
         timestamp.getMonth(),
@@ -418,11 +436,11 @@ class ApiABTestService {
         buckets[bucketKey] = {};
       }
 
-      if (!buckets[bucketKey][exec.variant_id]) {
-        buckets[bucketKey][exec.variant_id] = [];
+      if (!buckets[bucketKey][exec.variantId]) {
+        buckets[bucketKey][exec.variantId] = [];
       }
 
-      buckets[bucketKey][exec.variant_id].push(exec);
+      buckets[bucketKey][exec.variantId].push(exec);
     });
 
     return Object.entries(buckets)
@@ -434,9 +452,9 @@ class ApiABTestService {
             variantId,
             {
               requests: execs.length,
-              avgLatency: execs.reduce((sum: number, e: any) => sum + e.latency_ms, 0) / execs.length,
-              successRate: execs.filter((e: any) => e.status === 'success').length / execs.length,
-              errors: execs.filter((e: any) => e.status === 'error').length
+              avgLatency: execs.reduce((sum, e) => sum + e.latencyMs, 0) / execs.length,
+              successRate: execs.filter(e => e.status === 'success').length / execs.length,
+              errors: execs.filter(e => e.status === 'error').length
             }
           ])
         )
@@ -444,31 +462,8 @@ class ApiABTestService {
   }
 
   async getExecutions(testId: string, limit: number = 100): Promise<ApiABTestExecution[]> {
-    const { data, error } = await supabase
-      .from('api_ab_test_executions')
-      .select('*')
-      .eq('test_id', testId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (error || !data) {
-      console.error('Failed to fetch executions:', error);
-      return [];
-    }
-
-    return data.map(d => ({
-      id: d.id,
-      testId: d.test_id,
-      variantId: d.variant_id,
-      variantName: d.variant_name,
-      status: d.status,
-      latencyMs: d.latency_ms,
-      statusCode: d.status_code,
-      requestPayload: d.request_payload,
-      responsePayload: d.response_payload,
-      errorMessage: d.error_message,
-      timestamp: new Date(d.created_at)
-    }));
+    const executions = this.mockExecutions.get(testId) || [];
+    return executions.slice(0, limit);
   }
 }
 
