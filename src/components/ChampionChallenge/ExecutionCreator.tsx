@@ -19,8 +19,8 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [championWorkflowId, setChampionWorkflowId] = useState('');
-  const [challengeWorkflowId, setChallengeWorkflowId] = useState('');
+  const [championApiUrl, setChampionApiUrl] = useState('');
+  const [challengeApiUrl, setChallengeApiUrl] = useState('');
   const [requestPayload, setRequestPayload] = useState('{\n  "userId": "123",\n  "action": "process"\n}');
   const [isExecuting, setIsExecuting] = useState(false);
 
@@ -41,8 +41,16 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
       return;
     }
 
-    if (!championWorkflowId.trim() || !challengeWorkflowId.trim()) {
-      toast.error('Please select both champion and challenge workflows');
+    if (!championApiUrl.trim() || !challengeApiUrl.trim()) {
+      toast.error('Please enter both champion and challenge API URLs');
+      return;
+    }
+
+    try {
+      new URL(championApiUrl);
+      new URL(challengeApiUrl);
+    } catch {
+      toast.error('Please enter valid API URLs');
       return;
     }
 
@@ -56,8 +64,8 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
 
     try {
       const execution = await championChallengeService.executeComparison(
-        championWorkflowId,
-        challengeWorkflowId,
+        championApiUrl,
+        challengeApiUrl,
         JSON.parse(requestPayload),
         name,
         description
@@ -79,14 +87,6 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
       setIsExecuting(false);
     }
   };
-
-  const sampleWorkflows = [
-    { id: 'workflow-v1', name: 'Payment Processing v1' },
-    { id: 'workflow-v2', name: 'Payment Processing v2' },
-    { id: 'workflow-v3', name: 'Payment Processing v3' },
-    { id: 'order-flow-1', name: 'Order Fulfillment v1' },
-    { id: 'order-flow-2', name: 'Order Fulfillment v2' },
-  ];
 
   return (
     <Card className="p-6">
@@ -130,41 +130,37 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
             <div>
               <Label htmlFor="champion" className="font-semibold flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                Champion Workflow *
+                Champion API URL *
               </Label>
-              <select
+              <Input
                 id="champion"
-                value={championWorkflowId}
-                onChange={(e) => setChampionWorkflowId(e.target.value)}
-                className="w-full mt-1 px-3 py-2 border rounded-md bg-white"
-              >
-                <option value="">Select champion workflow</option>
-                {sampleWorkflows.map((wf) => (
-                  <option key={wf.id} value={wf.id}>
-                    {wf.name}
-                  </option>
-                ))}
-              </select>
+                type="url"
+                value={championApiUrl}
+                onChange={(e) => setChampionApiUrl(e.target.value)}
+                placeholder="https://api.example.com/v1/process"
+                className="mt-1 font-mono text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                The current/production API endpoint
+              </p>
             </div>
 
             <div>
               <Label htmlFor="challenge" className="font-semibold flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-600"></div>
-                Challenge Workflow *
+                <div className="w-3 h-3 rounded-full bg-orange-600"></div>
+                Challenge API URL *
               </Label>
-              <select
+              <Input
                 id="challenge"
-                value={challengeWorkflowId}
-                onChange={(e) => setChallengeWorkflowId(e.target.value)}
-                className="w-full mt-1 px-3 py-2 border rounded-md bg-white"
-              >
-                <option value="">Select challenge workflow</option>
-                {sampleWorkflows.map((wf) => (
-                  <option key={wf.id} value={wf.id}>
-                    {wf.name}
-                  </option>
-                ))}
-              </select>
+                type="url"
+                value={challengeApiUrl}
+                onChange={(e) => setChallengeApiUrl(e.target.value)}
+                placeholder="https://api.example.com/v2/process"
+                className="mt-1 font-mono text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                The new/experimental API endpoint to test
+              </p>
             </div>
           </div>
         </div>
@@ -189,13 +185,13 @@ export const ExecutionCreator: React.FC<ExecutionCreatorProps> = ({
           )}
         </div>
 
-        <Card className="p-4 bg-red-50 border-wells-red">
-          <h4 className="font-semibold mb-2 text-wells-red font-wells">How it works:</h4>
-          <ul className="text-sm text-gray-700 space-y-1">
-            <li>• Both workflows execute simultaneously with identical input</li>
-            <li>• Metrics are collected for every node in each workflow</li>
-            <li>• Performance is compared side-by-side with detailed analysis</li>
-            <li>• View request/response data and apply filters for deep insights</li>
+        <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <h4 className="font-semibold mb-2 text-blue-700 dark:text-blue-400">How it works:</h4>
+          <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <li>• Both APIs execute simultaneously with identical request payload</li>
+            <li>• Performance metrics collected: latency, response time, status codes</li>
+            <li>• Compare responses side-by-side with detailed analysis</li>
+            <li>• View request/response payloads and apply filters for deep insights</li>
           </ul>
         </Card>
 
